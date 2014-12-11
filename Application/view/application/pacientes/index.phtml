@@ -1,0 +1,90 @@
+<?php $user = $this->identity(); ?>
+<style>
+    .fila:hover .gli{
+        visibility: visible;
+    }
+    .gli {
+        float: right;
+        visibility: hidden;
+        margin: 0 5px 0 5px;
+    }
+</style>
+<h3>Pacientes</h3>
+<div class="row">
+   <div class="input-group input-group-lg col-sm-6" style="margin-top:25px">
+     <input type="text" class="form-control" id="bPaciente" placeholder="Buscar paciente...">
+     <span class="input-group-addon" onclick="pacientesx();" style="cursor:pointer"><span class="glyphicon glyphicon-search"></span></span>
+   </div>
+   <div class="col-sm-3" id="loadgif">
+       
+   </div> 
+</div>
+<div class="row">
+    <div class="panel panel-default" id="divPacientes" style="margin-top:15px;display:none"> 
+        <!-- /.panel-heading -->
+        <div class="panel-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="dataTables-example">
+                    <thead>
+                        <tr>
+                            <th>Nombre(s)</th>
+                            <th>Residente de</th>
+                            <th>Fecha de Nacimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bodyTable" id="tbodyRows">
+                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<form action='<?php echo $this->basePath()?>/pacientes/consultas' method="post" name="fPac" id="fPac">
+    <input type="hidden" value="" id="pac" name="pac"/>
+</form>
+<script>
+    $(document).ready(function() {
+        $("#bPaciente").focus();
+        $('#bPaciente').bind('keyup', function(e) {
+            if(e.keyCode==13){
+                pacientesx();
+            }
+        });
+    });
+    function pacientesx () {
+        var dato = document.getElementById('bPaciente').value;
+        $.ajax({
+            type: 'POST',
+            url: '<?php echo $this->basePath() ?>/pacientes/pacientesajax',
+            data: {nombre: dato},
+            beforeSend: function() {
+                $('#loadgif').html("<div class='col-md-1 col-md-offset-5' style='margin-top:30px;display:table'><div style='text-align:right;display:table-cell;vertical-align:middle'><img src='<?php echo $this->basePath() ?>/public/imagenes/282.GIF' width='60px' height='60px'/></div></div>");
+              },
+            success: function(data) {
+                $('#loadgif').html('');
+                 $('.bodyTable tr').remove();
+                 for(i = 0; i < data.length; i++){
+                         
+                         $('.bodyTable').append(
+                             "<tr class='fila'>"+
+                                 "<td>"+data[i].NOMBRE+" "+data[i].APELLIDO_PATERNO+" "+data[i].APELLIDO_MATERNO+"</td>"+
+                                 "<td>"+data[i].ESTADO+" "+data[i].MUNICIPIO+"</td>"+
+                                 "<td>"+data[i].FECHA_NACIMIENTO+"<a href='javascript:consultarpaciente("+data[i].ID+")'"+"><span class='glyphicon glyphicon-th-large gli' title='Detalles'></span></a>"+
+                                     "<a href='<?php echo $this->basePath()?>"+"/agenda/calendario/"+data[i].ID+"'><span class='glyphicon glyphicon-pencil gli' title='Editar'></span></a>"+
+                                 "</td>"+
+                             "</tr>");
+                     }
+                $('.panel').css("display","block");     
+                $('#dataTables-example').dataTable();
+            }  
+        });
+    }
+    function consultarpaciente(data) {
+        document.getElementById('pac').value = data;
+        document.fPac.submit();
+    }
+</script>
+
+

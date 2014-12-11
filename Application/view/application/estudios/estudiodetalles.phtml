@@ -1,0 +1,233 @@
+<?php 
+   echo $this->headLink()
+      ->appendStylesheet($this->basePath() . '/public/js/chosen_v1.1.0/chosen.css');
+  echo $this->headScript()
+          ->appendFile($this->basePath() . '/public/js/transition.js')
+          ->appendFile($this->basePath() . '/public/js/chosen_v1.1.0/chosen.jquery.js');
+?>
+<style type="text/css">
+  .col-md-1 {
+    width: 12%;
+  }
+</style>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="panel panel-primary" style="margin-top:5px">
+             <div class="panel-body" style="min-height:500px">
+                 <!-- Nav tabs -->
+                 <ul class="nav nav-pills">
+                     <li class="active"><a href="#general-pills" data-toggle="tab">General</a>
+                     </li>
+                     <li class=""><a href="#alergias-pills" data-toggle="tab">Alergias</a>
+                     </li>
+                 </ul>
+
+                 <!-- Tab panes -->
+                 <div class="tab-content">
+                     <div class="tab-pane fade active in" id="general-pills">
+                         <h4><?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO']; ?></h4>
+                         <p><img src="" class="img-thumbnail" style="width:140px;height:140px"></p>
+                         <p>Nombre: <?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO']; ?></p>
+                         <p>Edad: <span id="sEdad"></span></p>
+                         <p>Dirección: <?php echo $paciente[0]['CALLE'].' '.$paciente[0]['NUMERO_INT'] ?></p>
+                         <p>Colonia: <?php echo $paciente[0]['COLONIA'] ?></p>
+                         <p>C.P. : <?php echo $paciente[0]['CODIGO_POSTAL'] ?></p>
+                         <p>Tipo sanguíneo: <?php echo $paciente[0]['TIPO_SANGUINEO']['NOMBRE'] ?></p>
+                         <p>Discapacidad: <?php echo $paciente[0]['DISCAPACIDAD']['NOMBRE'] ?></p>
+                         <p>Médico que lo envía: <?php echo $medico; ?></p>
+                         <p>Especialidad: <?php echo $especialidad; ?></p>
+
+                     </div>
+                     <div class="tab-pane fade" id="antecedentes-pills">
+                         <h4>Heredo Familiares</h4>
+                         <h4>Clínicos</h4>
+                         <p>Lorem</p>
+                         <h4>Patológicos</h4>
+                         <p>Lorem</p>
+                         <h4>No patológicos</h4>
+                         <p>Lorem</p>
+                     </div>
+                     <div class="tab-pane fade" id="alergias-pills">
+                         <h4>Alergias</h4>
+                         <p>Lorem</p>
+                     </div>
+                 </div>
+             </div>
+             <!-- /.panel-body -->
+         </div> 
+    </div>
+    <div class="col-lg-9">
+        <div class="panel panel-primary" style="margin-top:5px">
+            <div class="panel-body" id="wrap">
+                    <ul class="nav nav-pills">
+                        <li><a href="#Imagenes" data-toggle="tab">Imágenes</a>
+                        </li>
+                        <li ><a href="#Material" data-toggle="tab">Material</a>
+                        </li>
+                        <li><a href="#Receta" data-toggle="tab">Receta</a>
+                        </li>
+                    </ul>
+                <div class="tab-content">
+                  <div class="tab-pane fade <?php if($estudio[0]['ESTADO'] != 1) { echo "active in"; } ?> in" id="Imagenes" style="min-height:450px">
+
+                  </div>
+                  <div class="tab-pane fade <?php if($estudio[0]['ESTADO'] == 1) { echo "active in"; } ?>" id="Material">
+                    <?php foreach ($categorias as $categoria) { ?>
+                    <?php if($categoria['materiales']) {  ?>
+                      <h3><?php echo $categoria['categoria']; if($estudio[0]['ESTADO'] == 1 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7 || $this->identity()->getRole()->getId() == 5)) { ?><button type="button" class="btn btn-warning" style="float:right" onclick="agregarfila(<?php echo $categoria['ID'] ?>,this)"><span class="glyphicon glyphicon-plus"></span></button><?php } ?></h3>
+                      <table class="table" id="t<?php echo $categoria['ID'] ?>">
+                        <thead>
+                          <th width="80%">Material</th>
+                          <th>Cantidad</th>
+                          <th></th>
+                        </thead>
+                        <tbody>
+                          <?php $i=0; foreach ($categoria['materiales'] as $mat) { $i++; ?>
+                              <tr id="tr<?php echo $categoria['ID'].'-'.$i ?>" idmaterial="<?php echo $mat['id'] ?>">
+                                <td><span class="materiales" onclick="cambiarSelect(this)"><?php echo $mat['material'] ?></span></td>
+                                <td><span class="cantidades" id="span<?php echo $categoria['ID'].'-'.$i ?>" onclick="switchToInput(this.id)"><?php echo $mat['cantidad'] ?></span></td>
+                                <td><?php if($estudio[0]['ESTADO'] == 1 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7 || $this->identity()->getRole()->getId() == 5)) { ?><span class="glyphicon glyphicon-remove" style="color:crimson;float:right;cursor:pointer" onclick="borrarFila('<?php echo $categoria['ID'].'-'.$i ?>')"></span><?php } ?></td>
+                              </tr>
+                          <?php } ?>  
+                        </tbody>
+                      </table>
+                      <?php } else {  ?>
+                        <h3><?php echo $categoria['categoria']?><?php if($estudio[0]['ESTADO'] == 1 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7 || $this->identity()->getRole()->getId() == 5)) { ?><button type="button" class="btn btn-warning" style="float:right" onclick="agregarfila(<?php echo $categoria['ID'] ?>,this)"><span class="glyphicon glyphicon-plus"></span></button><?php } ?></h3>
+                        <p style="color:crimson" id="p<?php echo $categoria['ID'] ?>">NO HAY MATERIAL REGISTRADO PARA ÉSTA CATEGORÍA DE ESTUDIO</p>
+                      <?php }} ?>
+                      <hr>
+                      <?php if($estudio[0]['ESTADO'] == 1 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7 || $this->identity()->getRole()->getId() == 5)) { ?><button type="button" class="btn btn-primary" style="float:right" onclick="guardarLista()">Generar estudio</button><?php } ?>
+                  </div>
+                  <div class="tab-pane fade" id="Receta" style="min-height:450px">
+                    
+                  </div>
+                </div>
+                <!-- tab -->
+            </div>
+        </div>
+    </div>
+</div> 
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#sEdad").text(getEdad('<?php echo date_format($paciente[0]["FECHA_NACIMIENTO"],"Y-m-d") ?>')+' años');
+    datastring = {idPaciente:<?php echo $estudio[0]['PACIENTE'] ?>,idEstudio:<?php echo $estudio[0][0]['ID'] ?>};
+      $.ajax({
+          type: "POST",
+          url: "<?php echo $this->basePath() ?>/estudios/imagenesestudio",
+          data: datastring,
+          dataType: "html",
+          success: function(data) {
+             $("#Imagenes").html(data);   
+             $.ajax({
+                 type: "POST",
+                 url: "<?php echo $this->basePath() ?>/estudios/estudioreceta",
+                 data: {idPaciente:<?php echo $estudio[0]['PACIENTE'] ?>,idEstudio:<?php echo $estudio[0][0]['ID'] ?>},
+                 dataType: "html",
+                 success: function(data) {
+                    $("#Receta").html(data);   
+                 },
+                 error: function(){
+                       alert('Ocurrió un error, inténtelo más tarde.');
+                 }
+             });
+          },
+          error: function(){
+                alert('Ocurrió un error, inténtelo más tarde.');
+          }
+      });
+  }); 
+  function getEdad(dateString) {
+    var hoy = new Date();
+    var fechaNacimiento = new Date(dateString);
+    var edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    var m = hoy.getMonth() - fechaNacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
+  }
+  <?php if($estudio[0]['ESTADO'] == 1) { ?>
+    function switchToInput (id) {
+        var $input = $("<input>", {
+            val: $("#"+id).text(),
+            type: "text",
+        });
+        $input.addClass("loadNum");
+        $input.attr('id', id);
+        $("#"+id).replaceWith($input);
+        $input.on("blur", function() { switchToSpan(id) });
+        $input.select();
+    };
+    function switchToSpan(id) {
+        var $span = $("<span>", {
+            text: $("#"+id).val()
+        });
+        $span.addClass("loadNum");
+        $span.attr('id',id);
+        $("#"+id).replaceWith($span);
+        $span.on("click", function() { switchToInput(id) });
+    };
+    var selectMaterial = "<select class='selectMat' id='selectMat'><?php foreach($listaMateriales as $mate) { ?><option value='<?php echo $mate['ID'] ?>'><?php echo $mate['MATERIAL'] ?></option><?php } ?></select>";
+    function cambiarSelect (dom) {
+        $(dom).removeAttr('onclick');
+        $(dom).parent().first().html(selectMaterial);
+        $("#selectMat").chosen();
+        setTimeout(function(){ $("#selectMat").trigger('chosen:open'); }, 0);
+        $("#selectMat").on('chosen:hiding_dropdown', function() {
+            cambiarSpan($("#selectMat"));
+        });
+    }
+    function cambiarSpan (elem) {
+        var nombreMaterial = $("#selectMat option:selected").text();
+        var idMaterial = $(elem).val();
+        var spanMaterial = "<span class='materiales' onclick='cambiarSelect(this)'>"+nombreMaterial+"</span>";
+        $(elem).closest('tr').attr('idmaterial',idMaterial);
+        $(elem).parent().html(spanMaterial);
+        
+    };
+    function agregarfila(categoria,elem) {
+        if($("#t"+categoria).length === 0) {
+          $(elem).parent().after("<table class='table' id='t"+categoria+"'><thead><th width='80%'>Material</th><th>Cantidad</th><th></th></thead><tbody></tbody>");
+          $("#p"+categoria).remove();
+        }
+        
+        var filasig = document.getElementById("t"+categoria).rows.length;
+        var id = "span"+categoria+"-"+filasig;
+        $("#t"+categoria+" tbody").append("<tr id='tr"+categoria+"-"+filasig+"'><td>"+selectMaterial+"</td><td><span class='cantidades' id='"+id+"' onclick='switchToInput(this.id)'>1</span></td><td><span class='glyphicon glyphicon-remove' style='color:crimson;float:right;cursor:pointer'"+' onclick="borrarFila(\''+categoria+'-'+filasig+'\')"></span></td></tr>');
+        $("#selectMat").chosen();
+        setTimeout(function(){ $("#selectMat").trigger('chosen:open'); }, 0);
+        $("#selectMat").on('chosen:hiding_dropdown', function() {
+            cambiarSpan($("#selectMat"));
+        });
+    }
+    function borrarFila(cate) {
+      $("#tr"+cate).remove();
+    }
+    function guardarLista () {
+    var aceptar = confirm("Al generar el estudio los materiales se descontarán del inventario, por lo cual ya no podrá editarse el material utilizado para éste estudio, haga click en aceptar para continuar o cancelar para regresar y continuar editando la información");
+    if(aceptar == true) {
+      materiales = [];
+      <?php foreach ($categorias as $categoria ) { ?>
+        if($("#t<?php echo $categoria['ID'] ?>").length != 0)  {
+          for(i=1;i<=document.getElementById('t'+<?php echo $categoria['ID'] ?>).rows.length-1;i++){
+              materiales.push({categoria:<?php echo $categoria['ID'] ?>,material:document.getElementById('t'+<?php echo $categoria['ID'] ?>).rows[i].getAttribute('idmaterial'),cantidad:document.getElementById('span'+<?php echo $categoria['ID'] ?>+'-'+i).innerHTML});
+            }
+        }
+      <?php } ?>
+      materiales = JSON.stringify(materiales);
+      $.ajax({
+              type: "POST",
+              url: "<?php echo $this->basePath() ?>/estudios/generarestudio",
+              dataType: "json",
+              data: {materialesarray:materiales,estudio:<?php echo $estudio[0][0]['ID'] ?>},
+              success: function(data) {
+                location.reload(true);
+              },
+              error: function(){
+                
+              }
+        });
+    }    
+  }
+  <?php } ?>
+</script>                                            

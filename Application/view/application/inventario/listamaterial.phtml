@@ -1,0 +1,55 @@
+<style type="text/css">
+    .gli {
+    	color: dodgerblue;
+        float: right;
+        margin: 0 5px 0 5px;
+        cursor: pointer;
+    }
+</style>
+<div class="col-lg-7">
+	<table class="table" id="tablaInventario">
+		<thead>
+			<th>Material</th>
+			<th>Fecha de caducidad</th>
+			<th>Cantidad (mínima)</th>
+			<th>Cantidad</th>
+		</thead>
+		<tbody>
+			<?php foreach ($material as $mat):  ?>
+				<tr class="fila">
+					<td><?php echo $mat['MATERIAL'] ?></td>
+					<td><?php if(date_format($mat['FECHACADUCIDAD'],'d-m-Y') == '30-11--0001') { echo '00-00-0000'; } else {echo date_format($mat['FECHACADUCIDAD'],'d-m-Y');} ?></td>
+					<td><?php echo $mat['CANTIDADMIN'] ?></td>
+					<td><?php if($mat['CANTIDAD'] <= $mat['CANTIDADMIN'] && $mat['CANTIDAD'] > 0){
+							echo '<span class="label label-warning">'.$mat['CANTIDAD'].'</span>';
+						}
+						if($mat['CANTIDAD'] > $mat['CANTIDADMIN']){
+							echo '<span class="label label-success">'.$mat['CANTIDAD'].'</span>';
+						}
+						if($mat['CANTIDAD'] <= 0){
+							echo '<span class="label label-danger">'.$mat['CANTIDAD'].'</span>';
+						}?><?php if($this->identity()->getRole()->getId() != 6) { ?><span class='glyphicon glyphicon-pencil gli' title='Editar' onclick='editarMaterial(<?php echo $mat['ID'] ?>)'></span><?php } ?></td>
+				</tr>
+			<?php endforeach ?>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+	    $('#tablaInventario').dataTable();
+	});
+	function editarMaterial(idMaterial) {
+		$.ajax({
+            type: "GET",
+            url: "materialnuevo/"+idMaterial,
+            dataType: "html",
+            success: function(data) {
+               $("#modalMaterialNuevoBody").html(data);
+               $('#modalMaterialNuevo').modal('show');
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+    	});
+	}
+</script>	

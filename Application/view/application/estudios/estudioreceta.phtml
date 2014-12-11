@@ -1,0 +1,90 @@
+<?php 
+if (defined('RUNNING_FROM_ROOT')) {
+  $this->plugin('basePath')->setBasePath($this->basePath().'/public');
+} 
+
+?>
+<div class="row">
+  <div class="col-sm-3">
+    <label>Fecha de la receta:</label>
+    <input type="date" class="form-control" id="fechareceta">
+  </div>
+  <div class="col-sm-3">
+    <label># de Folio:</label>
+    <input type="text" class="form-control" id="folioreceta">
+  </div>
+  <div class="col-sm-1">
+    <button type="button" class="btn btn-default" style="margin-top:25px;" id="guardarInfoReceta">OK</button>
+  </div>
+</div>
+<div class="fotorama" id="divfoto" data-nav="thumbs" style="margin-top:12px">
+  <?php if($imagenes) {
+          foreach($imagenes as $i) { $foto = explode('.',$i['IMAGEN']);?>
+            <a href="<?php echo $this->basePath().'/imagenes/Estudios/'.$idEstudio.'/Receta/'.$i['IMAGEN']?>">
+              <img src="<?php echo $this->basePath() .'/imagenes/Estudios/'.$idEstudio.'/Receta/'.$foto[0].'_th.'.$foto[1]?>">
+            </a>
+  <?php } ?>
+ <?php } ?>
+</div>
+<div class="row" id="divDrop">
+  <form action="<?php echo $this->basePath() ?>/estudios/recibirreceta" class="dropzone" id="receta-drop" style="margin-top:10px">
+    <input type="hidden" name="PACIENTE" value="<?php echo $idPaciente ?>" />
+    <input type="hidden" name="ESTUDIO" value="<?php echo $idEstudio ?>" />
+  </form>
+</div>
+<script type="text/javascript">
+  var myDropzone = new Dropzone("#receta-drop", {
+  paramName: "file", // The name that will be used to transfer the file
+    maxFilesize: 2, // MB
+    accept: function(file, done) {
+      done();
+    },
+    addRemoveLinks: true,
+    removedfile: function(file){
+      var datos = {archivo:file.name};
+      $.ajax({
+            type: "POST",
+            url: "remover",
+            data: datos,
+            dataType: "json",
+            success: function(data) {
+                    var _ref;
+                       if (file.previewElement) {
+                         if ((_ref = file.previewElement) != null) {
+                           _ref.parentNode.removeChild(file.previewElement);
+                         }
+                       }
+                       return this._updateMaxFilesReachedClass();
+                  },
+            error: function(data){
+                        var _ref;
+                          if (file.previewElement) {
+                            if ((_ref = file.previewElement) != null) {
+                              _ref.parentNode.removeChild(file.previewElement);
+                            }
+                          }
+                          return this._updateMaxFilesReachedClass();
+ 
+            }
+        });
+      }
+});
+$(document).ready(function(){
+  var guardarinfo = function () {
+    informacion = {fechareceta: $('#fechareceta').val(),folioreceta:$('#folioreceta').val(),estudio:<?php echo $idEstudio; ?>};
+    $.ajax({
+              type: "POST",
+              url: "<?php echo $this->basePath() ?>/estudios/guardarinforeceta",
+              dataType: "json",
+              data: informacion,
+              success: function(data) {
+                alert('Cambios guardados.');
+              },
+              error: function(){
+                alert('Problema de red');
+              }
+        });
+  };
+  $('#guardarInfoReceta').on('click',guardarinfo);
+});
+</script>

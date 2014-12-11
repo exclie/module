@@ -1,0 +1,478 @@
+<style type="text/css">
+  .col-md-1 {
+    width: 12%;
+  }
+</style>
+<form method="POST">
+  
+</form>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="contenedor" style="margin-top:5px;padding:10px">
+             <div class="panel-body">
+                 <!-- Nav tabs -->
+                 <ul class="nav nav-pills">
+                     <li class="active"><a href="#general-pills" data-toggle="tab">General</a>
+                     </li>
+                     <li class=""><a href="#antecedentes-pills" data-toggle="tab">Antecedentes</a>
+                     </li>
+                 </ul>
+
+                 <!-- Tab panes -->
+                 <div class="tab-content">
+                     <div class="tab-pane fade active in" id="general-pills">
+                         <h4><?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO']; ?></h4>
+                         <p><img src="" class="img-thumbnail" style="width:140px;height:140px"></p>
+                         <p>Nombre: <?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO']; ?></p>
+                         <p>Edad: <span id="sEdad"></span></p>
+                         <p>Dirección: <?php echo $paciente[0]['CALLE'].' '.$paciente[0]['NUMERO_INT'] ?></p>
+                         <p>Colonia: <?php echo $paciente[0]['COLONIA'] ?></p>
+                         <p>C.P. : <?php echo $paciente[0]['CODIGO_POSTAL'] ?></p>
+                         <p>Tipo sanguíneo: <?php echo $paciente[0]['TIPO_SANGUINEO']['NOMBRE'] ?></p>
+                         <p>Discapacidad: <?php echo $paciente[0]['DISCAPACIDAD']['NOMBRE'] ?></p>
+                     </div>
+                     <div class="tab-pane fade" id="antecedentes-pills">
+                         <h4>Heredo Familiares</h4>
+                         <p><?php foreach ($paciente[0]['ANTECEDENTES'] as $antecedente) {
+                            echo '<p>'.$antecedente['CIE_NUMERO'].' '.$antecedente['NOMBRE_ENFERMEDAD'].'</p>';
+                          } ?></p>
+                         <h4>Clínicos</h4>
+                         <p>Lorem</p>
+                         <h4>Patológicos</h4>
+                         <p>Lorem</p>
+                         <h4>No patológicos</h4>
+                         <p>Lorem</p>
+                     </div>
+                     <div class="tab-pane fade" id="alergias-pills">
+                         <h4>Alergias</h4>
+                         <p>Lorem</p>
+                     </div>
+                 </div>
+             </div>
+             <!-- /.panel-body -->
+         </div> 
+    </div>
+    <div class="col-lg-9">
+    <div class="contenedor" style="margin-top:5px;padding:10px">
+            <div class="panel-body" id="wrap">
+              <ul class="nav nav-pills" style="margin-bottom:15px">
+                  <li class="active" id="liListado"><a href="#Listado" data-toggle="tab">Listado</a>
+                  </li>
+                  <li class="" id="liConsulta"><a href="#consulta" data-toggle="tab">Consulta</a>
+                  </li>
+                  <li class="" id="liAnalisis"><a href="#" data-toggle="tab">Análisis</a>
+                  </li>
+                  <li class="" id="liImagenes"><a href="#Imagenes" data-toggle="tab" onclick="verImagenes()">Imágenes</a>
+                  </li>
+                  <li class="" id="liRecetas"><a href="#" data-toggle="tab">Recetas</a>
+                  </li>
+                  <li class="" id="liFacturas"><a href="#" data-toggle="tab">Facturas</a>
+                  </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade in" id="consulta">
+                  <div class="row">
+                <div class="col-md-6">
+                  <?php echo $this->form()->openTag($form); ?>
+                  <?php
+                      $element = $form->get('ID');
+                      echo $this->formRow($element);
+                      $element = $form2->get('IDSUB');
+                      echo $this->formRow($element);
+                       $element = $form->get('PACIENTE')->setAttributes(array('value' => $paciente[0]['ID']));
+                      echo $this->formRow($element);
+                      $element = $form2->get('DIAG_ARRAY');
+                      echo $this->formRow($element);
+                    ?>
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form->get('MOTIVO_CONS');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form->get('INFO_MOTIVO');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-6">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form->get('INFO_ADICIONAL');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+              </div>
+              <div class="row">
+                 <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('FC');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('FR');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('TA');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('PS');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('T');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('ALTURA');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('PESO');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+                <div class="col-md-1">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('IMC');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div>
+              </div>
+              <div class="row">
+                 <div class="col-md-12">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('SUBJETIVO');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div> 
+              </div>
+              <div class="row">
+                 <div class="col-md-12">
+                    <div id="divUsuario" class="form-group">
+                      <?php
+                      $element = $form2->get('OBJETIVO');
+                      echo $this->formRow($element);
+                    ?>
+                    </div> 
+                </div> 
+              </div>
+                <div class="row">
+                   <div class="col-md-12">
+                       <div id="divUsuario" class="form-group">
+                         <?php
+                         $element = $form2->get('DIAGNOSTICOS');
+                         echo $this->formRow($element);
+                       ?>
+                       </div> 
+                   </div> 
+                </div>
+                <div class="row">
+                  <div class="col-md-12 table-responsive">
+                    <table class="table table-bordered" id="tDiagnosticos">
+                      <thead>
+                          <th>Código</th>
+                          <th>Diagnóstico</th>
+                      </thead>
+                      <tbody>
+                  
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div style="float:right"> 
+                    <button type="button" class="btn btn-primary" onclick="guardarconsulta()">Guardar</button>        
+                </div>
+                </div>
+                <div class="tab-pane fade in" id="Imagenes">
+                  
+                </div> 
+                <div class="tab-pane fade active in" id="Listado">
+                  <div class="table-responsive" id="divTablaConsultas">
+                    <table class="table table-bordered" id="tConsultas">
+                    <thead>
+                      <th>Fecha       a</th>
+                      <th>Motivo <span style="float:right"><button class="btn btn-default btn-xs" type="submit" href="#consulta" data-toggle="tab" onclick="nuevaConsulta();">Nueva consulta</button></span></th>
+                    </thead>
+                    <tbody>
+                      <?php foreach($consultas as $c) { $x = 0;?>
+                          <tr>
+                            <td>
+                            <?php echo date_format($c['FECHA_CONS'],'d/m/Y'); ?></td>
+                            <td>
+                              <div class="panel-group" id="accordion<?php echo $c['ID'] ?>">
+                               <div class="panel panel-default">
+                                 <div class="panel-heading">
+                                   <h4 class="panel-title">
+                                     <a data-toggle="collapse" data-parent="#accordion<?php echo $c['ID'] ?>" href="#collapse<?php echo $c['ID'] ?>">
+                                       <?php echo $c['MOTIVO_CONS']; ?> 
+                                     </a>
+                                   </h4>
+                                 </div>
+                                 <div id="collapse<?php echo $c['ID'] ?>" class="panel-collapse collapse">
+                                   <div class="panel-body">
+                                     <table class="table">
+                                        <thead>
+                                          <th>Fecha <span style="float:right"><button class="btn btn-default btn-xs" type="submit" href="#consulta" data-toggle="tab" onclick="agregarEvolucion(<?php echo $c['ID'] ?>);">Agregar evolución</button></span></th>
+                                        </thead>
+                                        <tbody>
+                                        <?php foreach($c['CONSULTASUBS'] as $cs) { ?>
+                                          <tr>
+                                            <td><a href="#consulta" data-toggle="tab" onclick="irconsulta(<?php echo $cs['ID']; ?>);"><?php setlocale(LC_ALL,"es_ES"); $x++; echo strftime('%A %d de %B del %Y Evolución '.$x,$cs['FECHA_SUB']->getTimestamp()); ?></a></td>
+                                          </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                     </table>
+                                   </div>
+                                 </div>
+                               </div>
+                             </div> 
+                            </td>
+                          </tr>
+                       <?php } ?>
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
+                <?php echo $this->form()->closeTag(); ?>  
+                <!-- tab -->
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+var diagnosticos = [];
+  $(document).ready(function() {
+    $("#sEdad").text(getEdad('<?php echo date_format($paciente[0]["FECHA_NACIMIENTO"],"Y-m-d") ?>')+' años');
+    mostrarConsultas();
+  }); 
+    function split( val ) {
+      return val.split( /;\s*/ );
+    }
+    function extractLast( term ) {
+      return split( term ).pop();
+    }
+  $( "#cDiagnosticos" )
+      // don't navigate away from the field on tab when selecting an item
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "getCIE10", {
+            term: extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          // custom minLength
+          var term = extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          var terms = split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = terms.join( "" );
+          $("#tDiagnosticos tbody").append("<tr id='"+ui.item.name+"'>"+
+            "<td>"+ui.item.id+"</td>"+
+            "<td>"+this.value+"<span class='glyphicon glyphicon-remove' style='float:right;color:crimson'></span>"+"</td>"+
+            "</tr>");
+          $('#cDiagnosticos').val('');
+          return false;
+        }
+      });
+  function getEdad(dateString) {
+    var hoy = new Date();
+    var fechaNacimiento = new Date(dateString);
+    var edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    var m = hoy.getMonth() - fechaNacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
+  }
+  function irconsulta(idCon){
+    $('#liConsulta').toggleClass('active');
+    $('#liListado').toggleClass('active');
+    var datos = {pac: <?php echo $paciente[0]['ID']; ?>,consul: idCon};
+    $.ajax({
+            type: "POST",
+            url: "verconsulta",
+            data: datos,
+            dataType: "json",
+            success: function(data) {
+               $("#tDiagnosticos tbody").empty();
+               $("input,textarea").prop('readonly',true);
+               $('#cMotivo').val(data[0]['MOTIVO_CONS']);
+               $('#id_consulta').val(data[0]['ID']);
+               $('#aInfoMotivo').val(data[0]['INFO_MOTIVO']);
+               $('#aInfoAdicional').val(data[0]['INFO_ADICIONAL']);
+               $('#cAlt').val(data[0]['CONSULTASUBS'][0]['ALTURA']);
+               $('#id_consultasub').val(data[0]['CONSULTASUBS'][0]['ID']);
+               $('#cFC').val(data[0]['CONSULTASUBS'][0]['FC']);
+               $('#cFR').val(data[0]['CONSULTASUBS'][0]['FR']);
+               $('#cPS').val(data[0]['CONSULTASUBS'][0]['PS']);
+               $('#cIMC').val(data[0]['CONSULTASUBS'][0]['IMC']);
+               $('#cSubjetivo').val(data[0]['CONSULTASUBS'][0]['SUBJETIVO']);
+               $('#cObjetivo').val(data[0]['CONSULTASUBS'][0]['OBJETIVO']);
+               $('#cPeso').val(data[0]['CONSULTASUBS'][0]['PESO']);
+               $('#cT').val(data[0]['CONSULTASUBS'][0]['T']);
+               $('#cTA').val(data[0]['CONSULTASUBS'][0]['TA']);
+               for(i=0;i<=data[0]['CONSULTASUBS'][0]['DIAGNOSTICOS'].length-1;i++){
+                $("#tDiagnosticos tbody").append("<tr>"+
+                  "<td>"+data[0]['CONSULTASUBS'][0]['DIAGNOSTICOS'][i]['CIE_NUMERO']+"</td>"+
+                  "<td>"+data[0]['CONSULTASUBS'][0]['DIAGNOSTICOS'][i]['NOMBRE_ENFERMEDAD']+"<span class='glyphicon glyphicon-remove' style='float:right;color:crimson'></span>"+"</td>"+
+                  "</tr>");
+               }
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+  }
+  function guardarconsulta(){
+    var diagnosticos = [];
+    for(i=1;i<=document.getElementById('tDiagnosticos').rows.length-1;i++){
+      diagnosticos.push(document.getElementById('tDiagnosticos').rows[i].id);
+    }
+    diagnosticos = JSON.stringify(diagnosticos);
+    $('#diag_array').val(diagnosticos);
+    var datastring = $("#consultas").serialize();
+    $.ajax({
+            type: "POST",
+            url: "guardarconsulta",
+            data: datastring,
+            dataType: "json",
+            success: function(data) {
+                $('#id_consulta').val(data['resultado']['id_consulta']);
+                $('#id_consultasub').val(data['resultado']['consultasub']);
+                mostrarConsultas();
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+  }
+  function agregarEvolucion(idCon){
+    $('#liConsulta').toggleClass('active');
+    $('#liListado').toggleClass('active');
+    document.getElementById('consultas').reset();
+    $('#id_consulta').val(idCon);
+    $('#cSubjetivo').prop('readonly',false);
+    $('#cObjetivo').prop('readonly',false);
+    $('.signosvitales').prop('readonly',false);
+    $('#cDiagnosticos').prop('readonly',false);
+    var datos = {pac: <?php echo $paciente[0]['ID']; ?>,consul: idCon};
+    $.ajax({
+            type: "POST",
+            url: "verconsulta",
+            data: datos,
+            dataType: "json",
+            success: function(data) {
+               $("#tDiagnosticos tbody").empty();
+               $('#cMotivo').val(data[0]['MOTIVO_CONS']).prop('readonly',true);
+               $('#aInfoMotivo').val(data[0]['INFO_MOTIVO']).prop('readonly',true);
+               $('#aInfoAdicional').val(data[0]['INFO_ADICIONAL']).prop('readonly',true);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+  }
+  function nuevaConsulta(){
+    $('#liConsulta').toggleClass('active');
+    $('#liListado').toggleClass('active');
+    document.getElementById('consultas').reset();
+    $('#aInfoMotivo').prop('readonly',false);
+    $('#aInfoAdicional').prop('readonly',false);
+    $('#cMotivo').prop('readonly',false);
+    $('#cSubjetivo').prop('readonly',false);
+    $('#cObjetivo').prop('readonly',false);
+    $('.signosvitales').prop('readonly',false);
+    $('#cDiagnosticos').prop('readonly',false);
+    $("#tDiagnosticos tbody").empty();
+  }
+  function mostrarConsultas(){
+    var datos = {pac: <?php echo $paciente[0]['ID']; ?>};
+    $.ajax({
+            type: "POST",
+            url: "tablaconsultas",
+            data: datos,
+            dataType: "html",
+            success: function(data) {
+               $("#divTablaConsultas").html(data);   
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+  }
+  function verImagenes() {
+    var datos = {pac: <?php echo $paciente[0]['ID']; ?>,con: $('#id_consulta').val(),cons: $('#id_consultasub').val()};
+    $.ajax({
+            type: "POST",
+            url: "imagenesconsulta",
+            data: datos,
+            dataType: "html",
+            success: function(data) {
+               $("#Imagenes").html(data);   
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+  }
+</script>                                             

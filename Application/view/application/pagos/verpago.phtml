@@ -1,0 +1,125 @@
+<?php 
+	echo $this->headScript()
+		->appendFile($this->basePath().'/public/js/inputmask/jquery.inputmask.js')
+		->appendFile($this->basePath().'/public/js/inputmask/jquery.inputmask.numeric.extensions.js');
+	$form->get('CANTIDAD')
+		->setAttribute('onkeyup','calcularrestante()');
+?>
+<?php 
+	$sub = $pagos[0]['CANTIDAD']-$pagos[0]['IVA'];
+ ?>
+
+<div class="col-sm-12" style="float:none">
+	<?php $total = 0; foreach ($categorias as $pago) { $total+= $pago['COSTO']; ?>
+		<div class="row" id="categoria<?php echo $pago['ID'] ?>">
+			<div class="col-sm-6">
+				<div class="row">
+					<label>Servicio:</label>
+				</div>
+				<span><?php echo $pago['NOMBRECATEGORIA']; ?></span>
+			</div>
+			<div class="col-sm-2">
+				<div class="row">
+					<label>Monto:</label>
+				</div>
+				<span><?php echo '$ '.number_format($pago[0]['CANTIDAD'],2); ?></span>
+			</div>
+			<div class="col-sm-2">
+				<div class="row">
+					<label>Descuento:</label>
+				</div>
+				<span><?php echo '$ '.number_format($pago[0]['DESCUENTO'],2); ?></span>
+			</div>
+			<div class="col-sm-2">
+				<div class="row">
+					<label>Total:</label>
+				</div>
+				<span><?php echo '$ '.number_format($pago[0]['TOTAL'],2); ?></span>
+			</div>
+		</div>
+	<?php } ?>
+	<?php if ($pagos[0]['SERVICIOAD']) { ?>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="row">
+					<label>Servicio adicional:</label>
+				</div>
+				<span><?php echo $pagos[0]['SERVICIOAD']; ?></span>
+			</div>
+			<div class="col-sm-2">
+				<div class="row">
+					<label>Monto:</label>
+				</div>
+				<span><?php echo '$ '.number_format($pagos[0]['MONTOSERV']); ?></span>
+			</div>
+		</div>
+	<?php } ?>
+	<?php echo $this->form()->openTag($form); ?>
+	<?php echo $this->formRow($form->get('ID')); ?>
+	<div class="row" id="metodospago">
+		<hr>
+		<?php foreach ($tipos as $tipo) { ?>
+			<div id="pago1" class="row">
+				<div class="col-sm-5">
+					<label>Forma de pago:</label>
+					<span><?php echo $tipo['TIPOP']; ?></span>
+				</div>
+				<div class="col-sm-3">
+					<label>Importe:</label>
+					<span><?php echo '$ '.number_format($tipo[0]['MONTO'],2); ?></span>
+				</div>
+			</div>
+				<?php if($tipo['TIPOPID'] == 2 || $tipo['TIPOPID'] == 3) {  ?>
+				<div class="row">
+					<div class="col-sm-5">
+						<label>No. de Cuenta (últimos 4 dígitos): </label>
+						<span><?php echo $tipo[0]['NUMCUENTA']; ?></span>
+					</div>
+					<div class="col-sm-3">
+						<label>Tipo de tarjeta: </label>
+						<span><?php if($tipo[0]['TIPOTARJETA'] == 1) { echo "VISA"; } else if ($tipo[0]['TIPOTARJETA'] == 2) { echo "Mastercard"; }  else if ($tipo[0]['TIPOTARJETA'] == 3) { echo "American Express"; } ?></span>
+					</div>
+				</div>
+				<?php } else if ($tipo['TIPOPID'] == 4) { ?>
+				<div class="row">
+					<div class="col-sm-3">
+						<label>No. de Cuenta (últimos 4 dígitos)</label>
+						<span><?php echo $tipo[0]['NUMCUENTA']; ?></span>
+					</div>
+					<div class="col-sm-3">
+						<span><?php echo $tipo[0]['BANCO']; ?></span>
+					</div>
+				</div>
+				<?php } ?>
+				<hr>
+		<?php } ?>
+	</div>
+	<div class="row">
+		<div class="col-sm-3">
+			<div class="row">
+				<label>Subtotal:</label>
+			</div>
+			<span><?php echo '$ '.number_format($sub,2); ?></span>
+		</div>
+		<div class="col-sm-3">
+			<div class="row">
+				<label>IVA:</label>
+			</div>
+			<span><?php echo '$ '.number_format($pagos[0]['IVA'],2); ?></span>
+		</div>
+		<div class="col-sm-3">
+			<div class="row">
+				<label>Total:</label>
+			</div>
+			<span><?php echo '$ '.number_format($pagos[0]['CANTIDAD'],2); ?></span>
+		</div>
+		<div class="col-sm-3">
+			<div class="row">
+				<label>Cambio:</label>
+			</div>
+			<span><?php echo '$ '.number_format($pagos[0]['CAMBIO'],2); ?></span>
+		</div>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+	<a href="<?php echo $this->basePath() ?>/pagos/recibo/<?php echo $estudio ?>">Ver Recibo</a>
+</div>

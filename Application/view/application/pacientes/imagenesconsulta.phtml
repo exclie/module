@@ -1,0 +1,64 @@
+<link href="<?php echo $this->basePath() ?>/public/js/downloads/css/dropzone.css" rel="stylesheet">
+<link  href="<?php echo $this->basePath() ?>/public/js/fotorama/fotorama.css" rel="stylesheet"> 
+<script src="<?php echo $this->basePath() ?>/public/js/downloads/dropzone.js"></script>
+<script src="<?php echo $this->basePath() ?>/public/js/fotorama/fotorama.js"></script>
+<div class="fotorama" data-nav="thumbs">
+	<?php if($imagenes) foreach($imagenes as $i) { $foto = explode('.',$i['IMAGEN']);?>
+		<a href="<?php echo $this->basePath().'/public/imagenes/Consultas/'.$pac.'/'.$i['IMAGEN']?>">
+      <img src="<?php echo $this->basePath().'/public/imagenes/Consultas/'.$pac.'/'.$foto[0].'_th.'.$foto[1]?>">
+    </a>
+	<?php } ?>
+</div>
+<div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          Añadir imágenes
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+        	<form action="recibir" class="dropzone" id="zona-drop">
+        		<input type="hidden" name="paciente" value="<?php echo $pac ?>" />
+        		<input type="hidden" name="consulta" value="<?php echo $consulta ?>" />
+        		<input type="hidden" name="consultasub" value="<?php echo $consultasub ?>" />
+        	</form>
+      </div>
+<script>
+var myDropzone = new Dropzone("#zona-drop", {
+	paramName: "file", // The name that will be used to transfer the file
+	  maxFilesize: 2, // MB
+	  accept: function(file, done) {
+	    done();
+	  },
+	  addRemoveLinks: true,
+	  removedfile: function(file){
+	  	var datos = {archivo:file.name};
+	  	$.ajax({
+            type: "POST",
+            url: "remover",
+            data: datos,
+            dataType: "json",
+            success: function(data) {
+               	  	var _ref;
+                       if (file.previewElement) {
+                         if ((_ref = file.previewElement) != null) {
+                           _ref.parentNode.removeChild(file.previewElement);
+                         }
+                       }
+                       return this._updateMaxFilesReachedClass();
+               	  },
+            error: function(data){
+                  	  	var _ref;
+                          if (file.previewElement) {
+                            if ((_ref = file.previewElement) != null) {
+                              _ref.parentNode.removeChild(file.previewElement);
+                            }
+                          }
+                          return this._updateMaxFilesReachedClass();
+ 
+            }
+        });
+  	  }
+});
+</script>

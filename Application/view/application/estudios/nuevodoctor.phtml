@@ -1,0 +1,63 @@
+<?php 
+	 echo $this->headLink()
+	 		->appendStylesheet($this->basePath() . '/public/js/chosen_v1.1.0/chosen.css');
+     echo $this->headScript()
+            ->prependFile($this->basePath() . '/public/js/recursos/verificarCampos.js');
+
+     echo $this->headScript()
+            ->appendFile($this->basePath() . '/public/js/transition.js')
+            ->appendFile($this->basePath() . '/public/js/chosen_v1.1.0/chosen.jquery.js');
+?>
+<div class="col-sm-12" style="float:none">
+	<?php echo $this->form()->openTag($form); ?>
+	<?php echo $this->formRow($form->get('ID')); ?>
+	<div class="col-sm-12" style="float:none">
+		<?php echo $this->formRow($form->get('NOMBRE')); ?>
+	</div>
+	<div class="col-sm-12" style="float:none">
+		<?php echo $this->formRow($form->get('ESPECIALIDAD')); ?>
+	</div>
+	<div class="col-sm-12" style="float:none">
+		<?php echo $this->formRow($form->get('DEPENDENCIA')); ?>
+	</div>
+	<div class="col-sm-12" style="float:none">
+		<?php echo $this->formRow($form->get('EMAIL')); ?>
+	</div>
+	<div class="col-sm-12" style="float:none">
+		<?php echo $this->formRow($form->get('TELEFONO')); ?>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+</div>
+<script type="text/javascript">
+$(function() {
+	$('#sEspecialidad').chosen();
+	$('#sDependencia').chosen();
+});
+	function guardarDoctor () {
+		$.ajax({
+            type: "POST",
+            url: "nuevodoctor",
+            dataType: "json",
+            data: $("#doctores").serialize(),
+            success: function(data) {
+				$('#modalDoctorNuevo').modal('hide');
+				actualizarDoctores(data.idDoctor);
+            },
+            error: function(){
+                $('#modalDoctorNuevoBody').prepend('<div class="alert alert-danger fade" id="alertDoctorCreado" role="alert" style="padding:5px">El doctor no pudo ser agregado, existe un problema de red.</div>');
+				$('#alertDoctorCreado').transition({ opacity: 1 });
+            }
+    	});
+	}
+	function actualizarDoctores (idDoc) {
+		$.get('doctoresx',
+          function (data) {
+          	$('#sDoctor').empty();
+          	for(i = 0; i < data.length; i++){
+					$('#sDoctor').append("<option value='"+data[i].ID+"'>"+data[i].NOMBRE+"</option>");
+				}
+			$("#sDoctor").val(idDoc);
+			$("#sDoctor").trigger("chosen:updated");
+          });
+	}
+</script>

@@ -1,0 +1,317 @@
+<?php $user = $this->identity(); ?>
+<?php 
+   echo $this->headLink()
+      ->appendStylesheet($this->basePath() . '/public/js/chosen_v1.1.0/chosen.css');
+     echo $this->headScript()
+            ->appendFile($this->basePath() . '/public/js/recursos/verificarCampos.js');
+
+     echo $this->headScript()
+            ->appendFile($this->basePath() . '/public/js/transition.js')
+            ->appendFile($this->basePath() . '/public/js/chosen_v1.1.0/chosen.jquery.js');
+?>
+<div class="col-lg-12">
+    <h3 style="float:left">ESTUDIOS</h3>
+    <div class="dropdown" style="float:right">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-cog"> Opciones</span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#" onclick="estudioModal()">Nuevo estudio</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo $this->basePath() ?>/estudios/categorias">Categorías de estudio</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="<?php echo $this->basePath() ?>/pacientes/pacientenuevo">Nuevo paciente</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Agenda</a></li>
+      </ul>
+    </div>
+</div>
+<style>
+    .fila:hover .gli{
+        visibility: visible;
+    }
+    .gli {
+        float: right;
+        visibility: hidden;
+        margin: 0 5px 0 5px;
+    }
+</style>
+<div class="col-lg-12 alert alert-danger fade in" id="alertfechas" role="alert" style="display:none">
+  <button type="button" class="close" onclick="$(this).parent().hide()"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+  <p>"Desde" debe ser una fecha menor que "Hasta"</p>
+</div>
+<div class="col-sm-12" style="margin-top:15px">
+  <div class="col-sm-4">
+    <label for="aPaciente">Paciente:</label>
+    <input type="text" class="form-control" id="aPaciente">
+  </div>
+    <div class="col-sm-5" id="divFecha">
+        <div class="form-element col-sm-6">
+            <label for="cFecha1">Desde:</label>
+            <input type="date" class="form-control" id="cFecha1">
+        </div>
+        <div class="form-element col-sm-6">
+            <label for="cFecha2">Hasta:</label>
+            <input type="date" class="form-control" id="cFecha2"> 
+        </div>
+    </div>
+    <div class="col-sm-2" id="divEstado">
+        <label for="sEstado">Estado:</label>
+        <select id="sEstado" class="form-control dropdown">
+            <option value="0">Todos</option>
+            <option value="1">En proceso</option>
+            <option value="2">Generado</option>
+            <option value="3">Para entrega</option>
+            <option value="4">Entregado</option>
+            <option value="5">Cancelado</option>
+        </select>
+    </div>
+    
+    <div class="col-sm-1" id="divBuscar">
+        <button type="button" class="btn btn-primary" style="margin-top:25px" onclick="listaBusqueda()"><span class="glyphicon glyphicon-search"></span></button>
+    </div>
+</div>
+<div class="col-sm-12" style="min-height:500px" id="divTablaEstudios">
+    
+</div>
+<!-- MODAL NUEVO ESTUDIO -->
+<div class="modal fade" id="modalEstudioNuevo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h4 class="modal-title" id="modalLabel">Nuevo Estudio</h4>
+      </div>
+      <div class="modal-body" id="modalEstudioNuevoBody" style="min-height:150px">
+        
+      </div>
+      <div class="modal-footer" id="modalEstudioNuevoFooter">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="bEnviar" onclick="guardarEstudio()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MODAL DOCTOR NUEVO -->
+<div class="modal fade" id="modalDoctorNuevo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h4 class="modal-title" id="modalLabel">Registrar Doctor</h4>
+      </div>
+      <div class="modal-body" id="modalDoctorNuevoBody" style="min-height:150px">
+        
+      </div>
+      <div class="modal-footer" id="modalDoctorNuevoFooter">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="bEnviar" onclick="guardarDoctor()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MODAL PAGOS -->
+<div class="modal fade" id="modalPagoNuevo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width:900px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h4 class="modal-title" id="modalLabel">Pago</h4>
+      </div>
+      <div class="modal-body" id="modalPagoNuevoBody" style="min-height:150px">
+        
+      </div>
+      <div class="modal-footer" id="modalPagoNuevoFooter">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="bEnviarpago" onclick="guardarPago()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $("#sEstado").chosen();
+        listaEstudios();
+        function split( val ) {
+          return val.split( /;\s*/ );
+        }
+        function extractLast( term ) {
+          return split( term ).pop();
+        }
+        $( "#aPaciente" )
+      // don't navigate away from the field on tab when selecting an item
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "pacientes", {
+            term: extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          // custom minLength
+          var term = extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          $(this).attr('idpaciente',ui.item.id);
+          var terms = split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = terms.join( "" );
+          return false;
+        }
+      });      
+    });
+    function verestudio(id) {
+        window.location.href='estudiodetalles/'+id;
+    }
+    function estudioModal() {
+        $('#modalEstudioNuevo').modal('show');
+        $.ajax({
+            type: "GET",
+            url: "nuevoestudio",
+            dataType: "html",
+            beforeSend: function() {
+                $('#modalEstudioNuevoBody').html("<div class='col-md-1 col-md-offset-5' style='margin-top:30px;display:table'><div style='text-align:right;display:table-cell;vertical-align:middle'><img src='<?php echo $this->basePath() ?>/public/imagenes/282.GIF' width='60px' height='60px'/></div></div>");
+              },
+            success: function(data) {
+               $('#modalEstudioNuevoBody').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+    function editarEstudioModal(id) {
+      $('#modalEstudioNuevo').modal('show');
+        $.ajax({
+            type: "GET",
+            url: "nuevoestudio/"+id,
+            dataType: "html",
+            beforeSend: function() {
+                $('#modalEstudioNuevoBody').html("<div class='col-md-1 col-md-offset-5' style='margin-top:30px;display:table'><div style='text-align:right;display:table-cell;vertical-align:middle'><img src='<?php echo $this->basePath() ?>/public/imagenes/282.GIF' width='60px' height='60px'/></div></div>");
+              },
+            success: function(data) {
+               $('#modalEstudioNuevoBody').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+    function listaEstudios() {    
+        $.ajax({
+            type: "GET",
+            url: "listaestudios",
+            dataType: "html",
+            beforeSend: function() {
+                $('#divTablaEstudios').html("<div class='col-md-1 col-md-offset-5' style='margin-top:100px;display:table'><div style='text-align:right;display:table-cell;vertical-align:middle'><img src='<?php echo $this->basePath() ?>/public/imagenes/282.GIF' width='100px' height='100px'/></div></div>");
+              },
+            success: function(data) {
+               $("#divTablaEstudios").html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+    function listaBusqueda() {
+        var cFecha1 = $("#cFecha1").val();
+        var cFecha2 = $("#cFecha2").val();
+        var idDoc = $("#sDoctores").val();
+        if($("#aPaciente").val() != '') {
+          var idPac = $("#aPaciente").attr('idpaciente');
+        }
+        var idEstado = $("#sEstado").val();
+        if(cFecha1 != '' || cFecha2 != '') {
+          var startDate = new Date(cFecha1);
+          var endDate = new Date(cFecha2);
+
+          if (startDate > endDate){
+            $("#alertfechas").show('fast');
+            return 0;
+          } 
+        }
+        if((cFecha1 != '' && cFecha2 == '') || (cFecha2 != '' && cFecha1 == '')) {
+          $("#alertfechas").show('fast');
+            return 0;
+        }
+        $.ajax({
+            type: "POST",
+            url: "listaestudios",
+            dataType: "html",
+            data: {fecha1:cFecha1,fecha2:cFecha2,doctor:idDoc,paciente:idPac,estado:idEstado},
+            beforeSend: function() {
+                $('#divTablaEstudios').html("<div class='col-md-1 col-md-offset-5' style='margin-top:100px;display:table'><div style='text-align:right;display:table-cell;vertical-align:middle'><img src='<?php echo $this->basePath() ?>/public/imagenes/282.GIF' width='100px' height='100px'/></div></div>");
+              },
+            success: function(data) {
+               $("#divTablaEstudios").html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+    function doctorModal() {
+        $('#modalDoctorNuevo').modal('show');
+        $.ajax({
+            type: "GET",
+            url: "nuevodoctor",
+            dataType: "html",
+            success: function(data) {
+               $('#modalDoctorNuevoBody').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+    function pagoModal(id) {
+        $('#modalPagoNuevo').modal('show');
+        $('#bEnviarpago').css('display','inline');
+        $.ajax({
+            type: "GET",
+            url: "<?php echo $this->basePath() ?>/pagos/pagorecepcion/"+id,
+            dataType: "html",
+            success: function(data) {
+               $('#modalPagoNuevoBody').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+
+    function verPago(id) {
+        $('#modalPagoNuevo').modal('show');
+        $('#bEnviarpago').css('display','none');
+        $.ajax({
+            type: "GET",
+            url: "<?php echo $this->basePath() ?>/pagos/verpago/"+id,
+            dataType: "html",
+            success: function(data) {
+               $('#modalPagoNuevoBody').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+        });
+    }
+</script>
+
+

@@ -1,0 +1,76 @@
+<?php 
+if (defined('RUNNING_FROM_ROOT')) {
+  $this->plugin('basePath')->setBasePath($this->basePath().'/public');
+} ?>
+<?php echo $this->doctype(); ?>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <?php echo $this->headTitle('Imedich.')->setAutoEscape(false) ?>
+
+        <?php echo $this->headMeta()
+            ->appendName('viewport', 'width=device-width, initial-scale=1.0')
+            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ?>
+
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
+                        ->prependStylesheet($this->basePath() . '/css/font-awesome.min.css')
+                        ->prependStylesheet($this->basePath() . '/css/style.css')
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap-theme.min.css')
+                        ->prependStylesheet($this->basePath() . '/js/jquery-ui/jquery-ui.min.css')
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap.css') 
+                        ->prependStylesheet($this->basePath() . '/css/plugins/dataTables/dataTables.bootstrap.css') ?>
+
+        <!-- Scripts -->
+        <?php echo $this->headScript()
+            ->prependFile($this->basePath() . '/js/plugins/dataTables/dataTables.bootstrap.js')
+            ->prependFile($this->basePath() . '/js/plugins/dataTables/jquery.dataTables.js')
+            ->prependFile($this->basePath() . '/js/bootstrap.min.js')
+            ->prependFile($this->basePath() . '/js/jquery-ui/jquery-ui.min.js')
+            ->prependFile($this->basePath() . '/js/jquery.min.js')
+            ->prependFile($this->basePath() . '/js/respond.min.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+            ->prependFile($this->basePath() . '/js/html5shiv.js',   'text/javascript', array('conditional' => 'lt IE 9',))
+        ; ?>
+
+    </head>
+    <style type="text/css">
+    hr{
+        width: 100%;
+    }
+    </style>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="<?php echo $this->url('home') ?>"><img width="250px" height="40px" src="<?php echo $this->basePath() ?>/imagenes/Logo-Medimagen1.png"></a>
+                    <!-- BARRA DE INICIO -->
+                </div>
+                <div class="collapse navbar-collapse">
+                    <?php if($this->identity()) { ?>
+                    <ul class="nav navbar-nav">
+                        <li><a href="<?php echo $this->url('pacientes', array('action'=>'pacientenuevo')); ?>"><i class="fa fa-user"></i> Registrar paciente</a></li>
+                        <li><a href="<?php echo $this->url('estudios', array('action'=>'')) ?>"><i class="fa fa-stethoscope"></i> Estudios</a></li>
+                        <li><a href="<?php echo $this->url('agenda'); ?>"><i class="fa fa-table"></i> Agenda</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="<?php echo $this->url('user-index', array('action' => 'logout')); ?>"><i class="fa fa-lock"></i> Cerrar sesión</a></li>
+                    </ul>
+                    <?php } ?>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+        <div class="container">
+            <div style="min-height:550px">
+                <?php echo $this->content; ?>    
+            </div>
+        </div>
+        <!-- /container -->
+        <?php echo $this->inlineScript() ?>
+    </body>
+</html>

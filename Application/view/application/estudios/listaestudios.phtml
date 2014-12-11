@@ -1,0 +1,99 @@
+<div class="panel panel-default" style="margin-top:15px;"> 
+    <!-- /.panel-heading -->
+    <form method="post" action="<?php echo $this->basePath() ?>/pacientes/nuevopaciente" name="pacienteestudioform">
+        <input type="hidden" id="idestudio" name="idestudio">
+    </form>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover" id="tablaEstudios">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Fecha</th>
+                        <th width="40%">Estudio</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="bodyTable">
+                    <?php foreach ($estudios as $est): ?>
+                        <tr>
+                            <td><?php if($est['NOMBRE']){ echo "<font color='green'>".$est['NOMBRE'].' '.$est['APELLIDO_PATERNO'].' '.$est['APELLIDO_MATERNO']."</font>"; } 
+                            else {  
+                                echo "<font color='crimson'>".$est[0]['PACIENTE_NR']."</font>"
+                             ;} ?></td>
+                            <td><?php echo date_format($est[0]['FECHA'],'Y/m/d') ?></td>
+                            <td><?php $total = 0; foreach($est[0]['TIPOS'] as $categoria) {
+                                    $total+= ($categoria['COSTO']*1.16);
+                                    echo $categoria['NOMBRECATEGORIA'].', ';
+                                } ?></td>
+                            <td><?php echo '$ '.number_format($total,2); ?></td>
+                            <td><?php if ($est['esNombre'] == 'En proceso'): ?>
+                                <span class="label label-griscafe">En proceso</span>
+                            <?php endif; ?>
+                            <?php if ($est['esNombre'] == 'Por interpretar'): ?>
+                                <span class="label label-vbajo">Generado (s/int.)</span>
+                            <?php endif; ?>
+                            <?php if ($est['esNombre'] == 'Para entrega'): ?>
+                                <a href="<?php echo $this->basePath().'/estudios/interpretacionpdf/'.$est[0]['ID'] ?>"><span class="label label-verde">Para entrega</span></a>
+                            <?php endif ?>
+                            <?php if ($est['esNombre'] == 'Entregado'): ?>
+                                <span class="label label-entregado">Entregado</span>
+                            <?php endif ?>
+                            <?php if ($est['esNombre'] == 'Retraso'): ?>
+                                <span class="label label-danger">Retraso</span>
+                            <?php endif ?>
+                            <?php if ($est['esNombre'] == 'Cancelado'): ?>
+                                <span class="label label-default">Cancelado</span>
+                            <?php endif ?>
+                            <?php if ($est['esNombre'] == 'Agendado'): ?>
+                                <span class="label label-default">Agendado</span>
+                            <?php endif ?>
+
+                            <?php if ($est[0]['PAGADO'] == 1) { ?>
+                                <span class="label label-azul" onclick="verPago(<?php echo $est[0]['ID'] ?>)" style="cursor:pointer">P</span>
+                            <?php } else if($est['DEPENDENCIA'] == 8) { ?>
+                                <span class="glyphicon glyphicon-usd" style="float:right;cursor:pointer;color:blue;margin-left:10px" onclick="pagoModal(<?php echo $est[0]['ID'] ?>)" id="iconoEntregar" title="Pagar estudio"></span>
+                            <?php } ?>
+                                <?php if ($est['esID'] == 3): ?>
+                                    <span class="glyphicon glyphicon-ok" style="float:right;cursor:pointer;color:green;margin-left:10px" onclick="entregarEstudio(<?php echo $est[0]['ID'] ?>)" id="iconoEntregar" title="Entregar estudio"></span>
+                                    
+                                <?php endif ?>
+                                <?php if ($est['esID'] != 8): ?>
+                                    <span class="glyphicon glyphicon-folder-open" style="float:right;cursor:pointer;color:dodgerblue" id="iconoCarpeta" onclick="verestudio(<?php echo $est[0]['ID'] ?>)"></span>    
+                                <?php endif ?>
+                                <?php if ($est['NOMBRE'] && $est['esID'] === 8): ?>
+                                    <span class="glyphicon glyphicon-edit" style="float:right;cursor:pointer;color:dodgerblue" id="iconoEditar" onclick="editarEstudioModal(<?php echo $est[0]['ID'] ?>)"></span>    
+                                <?php endif ?>
+                                <?php if (!$est['NOMBRE']) { ?>
+                                    <a href="<?php echo $this->basePath() ?>/pacientes/pacientenuevo/<?php echo $est[0]['ID'] ?>"><span class="glyphicon glyphicon-user" style="float:right;cursor:pointer;color:dodgerblue" id="iconoRegistrar"></span> </a>   
+                                <?php } ?>
+                            </td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>    
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#tablaEstudios').dataTable({"order":[[1,'desc']]});    
+    });
+
+    function entregarEstudio(id) {
+        $.ajax({
+                 type: "POST",
+                 url: "<?php echo $this->basePath() ?>/estudios/entregar",
+                 dataType: "json",
+                 data: {estudio:id},
+                 success: function(data) {
+                   listaEstudios();
+                 },
+                 error: function(){
+                   
+                 }
+           });
+    }
+</script>
+

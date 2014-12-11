@@ -1,0 +1,351 @@
+<?php 
+	echo $this->headScript()
+		->appendFile($this->basePath().'/public/js/inputmask/jquery.inputmask.js')
+		->appendFile($this->basePath().'/public/js/inputmask/jquery.inputmask.numeric.extensions.js');
+	$form->get('CANTIDAD')
+		->setAttribute('onkeyup','calcularrestante()');
+?>
+<div class="col-sm-12" style="float:none">
+	<?php $total = 0; foreach ($estudio[0]['TIPOS'] as $est) { $total+= $est['COSTO']; ?>
+		<div class="row" id="categoria<?php echo $est['ID'] ?>">
+			<div class="col-sm-6">
+				<label>Servicio:</label>
+				<input type="text" class="form-control" readonly="readonly" value=" <?php echo $est['NOMBRECATEGORIA']; ?> " id="cNombreCat">
+			</div>
+			<div class="col-sm-2">
+				<label>Monto:</label>
+				<input type="text" readonly="readonly" class="form-control" value=" <?php echo '$ '.number_format($est['COSTO'],2); ?> " id="cMonto">
+			</div>
+			<div class="col-sm-2">
+				<label>Descuento:</label><input type="checkbox" id="checkdescuento" onchange="cambiarporciento(this)">(%)
+				<div class="input-group" style="display:none" id="divPorciento">
+				  <input type="text" min="1" max="100" maxlength="3" class="porcentaje form-control" style="text-align:right" id="cPorcentaje" name="porcentaje">
+				  <span class="input-group-addon">%</span>
+				</div>
+				<input type="text" class="descuento form-control" id="descuento">
+			</div>
+			<div class="col-sm-2">
+				<label>Total:</label>
+				<input type="text" readonly="readonly" class="totales form-control" value=" <?php echo '$ '.number_format($est['COSTO'],2); ?> " id="cTotal" idcategoria="<?php echo $est['ID'] ?>">
+			</div>
+		</div>
+	<?php } ?>
+		<div class="row">
+			<div class="col-sm-6">
+				<label>Servicio adicional:</label>
+				<input type="text" class="form-control" value="" id="cServicioAd">
+			</div>
+			<div class="col-sm-2">
+				<label>Monto:</label>
+				<input type="text" class="form-control" value="" id="cMontoserv" onkeyup="calcularadicional()">
+			</div>
+		</div>
+	<?php echo $this->form()->openTag($form); ?>
+	<?php echo $this->formRow($form->get('ID')); ?>
+	<div class="row" id="metodospago">
+		<hr>
+		<div id="pago1">
+			<div class="col-sm-5">
+				<?php echo $this->formRow($form->get('TIPOPAGO')); ?>
+			</div>
+			<div class="col-sm-3">
+				<?php echo $this->formRow($form->get('CANTIDAD')); ?>
+			</div>
+			<div class="col-sm-3">
+					<button type="button" class="btn btn-default" style="margin-top:25px" onclick="agregarpago()">Añadir otra forma de pago</button>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<hr>
+		<div class="col-sm-3">
+			<label>Subtotal:</label>
+			<input type="text" readonly="readonly" class="form-control" value="<?php echo number_format($total); ?>" id="cSubtotal">
+		</div>
+		<div class="col-sm-3">
+			<label>IVA:</label>
+			<input type="text" readonly="readonly" class="form-control" value="<?php echo number_format($total*.16,2); ?>" id="cIVA">
+		</div>
+		<div class="col-sm-3">
+			<label>Total:</label>
+			<input type="text" readonly="readonly" class="form-control" value="<?php echo number_format($total*1.16,2); ?>" id="cTotalapagar">
+		</div>
+		<div class="col-sm-3">
+			<input type="hidden" id="hImporte">
+			<input type="hidden" id="hCambio">
+			<input type="hidden" id="hTotal">
+			<input type="hidden" id="hIva">
+			<label>Cambio :</label>
+			<input type="text" readonly="readonly" class="form-control" value="<?php echo number_format(0,2); ?>" id="cCambio">
+		</div>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.Montos').inputmask('currency');
+		$('.descuento').inputmask('currency');
+		$('#cMontoserv').inputmask('currency');
+	});
+	var canpagos = 1;
+	var calcular = function() {
+		row = $(this).parent().parent();
+		monto = $(row).find('#cMonto').val();
+		monto = monto.replace('$','');
+		monto = monto.replace(/,/g,'');
+		monto = parseFloat(monto);
+		descuento = $(this).val();
+		if(descuento != ''){
+			descuento = descuento.replace('$','');
+			descuento = descuento.replace(/,/g,'');
+			descuento = parseFloat(descuento);
+			totalnuevo = 0;
+			totalnuevo = monto-descuento;
+			$(row).find('#cTotal').val(numeral(totalnuevo).format('$ 0,0.00'));
+		} else {
+			$(row).find('#cTotal').val(numeral(monto).format('$ 0,0.00'));
+		}	
+		subtotal = 0;
+		$('.totales').each(function() {
+			x = $(this).val();
+			x = x.replace('$','');
+			x = x.replace(/,/g,'');
+			subtotal += parseFloat(x);
+		});
+		iva = subtotal*(0.16);
+		total = subtotal*(1.16);
+		calcularadicional();
+		calcularrestante();
+
+	};
+	
+	var calcularporciento = function() {
+		row = $(this).parent().parent().parent();
+		porcentaje = $(this).val();
+		monto = $(row).find('#cMonto').val();
+		monto = monto.replace('$','');
+		monto = monto.replace(/,/g,'');
+		monto = parseFloat(monto);
+		total = (1-(porcentaje/100))*monto;
+		$(row).find('#cTotal').val(numeral(total).format('$ 0,0.00'));
+		subtotal = 0;
+		$('.totales').each(function() {
+			x = $(this).val();
+			x = x.replace('$','');
+			x = x.replace(/,/g,'');
+			subtotal += parseFloat(x);
+		});
+		iva = subtotal*(0.16);
+		total = subtotal*(1.16);
+		calcularadicional();
+		calcularrestante();
+
+	}
+
+	var checartipo = function () {
+		tipo = $(this).val();
+		id = $(this).parent().parent().prop('id');
+		if (tipo == 2 || tipo == 3) {
+			$("#cheque"+id).remove();
+			$("#tarjeta"+id).remove();
+			$(this).parent().parent().append(
+				'<div id="tarjeta'+id+'">'+
+					'<div class="col-sm-5">'+
+						'<label>No. de Cuenta (últimos 4 dígitos) :</label>'+
+						'<input type="text" class="form-control" id="numcheque" name="numcheque">'+
+					'</div>'+
+					'<div class="col-sm-3">'+
+						'<label>Tipo de tarjeta :</label>'+
+						'<select id="tipotarjeta" class="form-control" style="width:100px" name="tipotarjeta"><option value="1">VISA</option><option value="2">MASTER CARD</option><option value="3">American Express</option></select>'+
+					'</div>'+
+				'</div>'
+			);
+		} else if (tipo == 4) {
+			$("#cheque"+id).remove();
+			$("#tarjeta"+id).remove();
+			$(this).parent().parent().append(
+				'<div id="cheque'+id+'">'+
+					'<div class="col-sm-5">'+
+						'<label>No. de Cuenta (últimos 4 dígitos) :</label>'+
+						'<input type="text" class="form-control" id="numcheque" name="numcheque">'+
+					'</div>'+
+					'<div class="col-sm-3">'+
+						'<label>Banco</label>'+
+						'<input type="text" class="form-control" id="banco" name="banco">'+
+					'</div>'+
+				'</div>'
+			);
+		} else {
+			$("#cheque"+id).remove();
+			$("#tarjeta"+id).remove();
+		}
+	}
+	$('.descuento').on('keyup',calcular);
+	$('.porcentaje').on('keyup',calcularporciento);
+	$('.tipospago').on('change',checartipo);
+
+	function agregarpago () {
+		var restante = $('#cCambio').val();
+		restante = restante.replace('-','');
+		restante = restante.replace(',','');
+		restante = restante.replace('$','');
+		canpagos++;
+		$('#metodospago').append(                            
+			'<div id="pago'+canpagos+'"><hr>'+
+				'<div class="col-sm-5">'+
+					'<label>Forma de pago:</label>'+ 
+					'<select name="TIPOPAGO" class="tipospago form-control dropdown" id="sTipopago"><option value="1">Efectivo</option>'+
+						'<option value="2">Tarjeta débito</option>'+
+						'<option value="3">Tarjeta crédito</option>'+
+						'<option value="4">Cheque</option></select>'+
+				'</div>'+
+			'<div class="col-sm-3">'+
+				'<label>Monto:</label>'+
+				'<input type="text" name="CANTIDAD" class="Montos Input form-control" canpagos="'+canpagos+'" id="cMonto" onblur="verificar_campo(this)" onkeyup="calcularrestante()" style="text-align: right;">'+
+			'</div>'+
+			'<div class="col-sm-1">'+
+				'<button type="button" class="btn btn-danger" onclick="removerpago('+canpagos+')" style="margin-top:25px"><span class="glyphicon glyphicon-remove"></span></button>'+
+			'</div>'+
+			'</div>'
+		);
+		$('.tipospago').on('change',checartipo);
+		$('.Montos[canpagos="'+canpagos+'"]').val(numeral(restante).format('$ 0,0.00'));
+		calcularrestante();
+	}
+	function removerpago (pago) {
+		$('#pago'+pago).remove();
+		var importe = 0;
+		calcularrestante();
+		canpagos--;
+	}
+	function calcularrestante () {
+		var importe = 0;
+		$('.Montos').each(function () {
+			x = $(this).val();
+			x = x.replace('$','');
+			x = x.replace(/,/g,'');
+			importe += parseFloat(x);
+		});
+		total = $('#cTotalapagar').val();
+		total = total.replace('$','');
+		total = total.replace(/,/g,'');
+		total = parseFloat(total);
+		restante = importe-total;
+		
+		$('#hImporte').val(importe);
+		$('#hCambio').val(restante);
+		$('#hTotal').val(total);
+		$('#cCambio').val(numeral(restante).format('$ 0,0.00'));
+	}
+
+	function calcularadicional () {
+		subtotal = 0;
+		$('.totales').each(function() {
+			x = $(this).val();
+			x = x.replace('$','');
+			x = x.replace(/,/g,'');
+			subtotal += parseFloat(x);
+		});
+		adicional = $('#cMontoserv').val();
+		if (adicional != 0) {
+			adicional = adicional.replace('$','');
+			adicional = adicional.replace(/,/g,'');
+			adicional = parseFloat(adicional);
+		} else {
+			adicional = 0;
+		}
+		totalnuevo = 0;	
+		totalnuevo = subtotal+adicional;
+		iva = totalnuevo*(0.16);
+		total = totalnuevo*(1.16);
+		$('#cSubtotal').val(numeral(totalnuevo).format('$ 0,0.00'));
+		$('#cIVA').val(numeral(iva).format('$ 0,0.00'));
+		$('#hIva').val(numeral(iva).format('0.00'));
+		$('#cTotalapagar').val(numeral(total).format('$ 0,0.00'));
+		calcularrestante();
+	}
+	function cambiarporciento (elem) {
+		if ($(elem).prop('checked')) {
+			$(elem).parent().find("#divPorciento").css("display", "");
+			$(elem).parent().find("#cPorcentaje").val('');
+			$(elem).parent().find("#descuento").hide();
+			$(elem).parent().find("#descuento").val('');
+			$(elem).parent().find("#descuento").val('');
+			Total = $(elem).parent().parent().find("#cMonto").val();
+			$(elem).parent().parent().find("#cTotal").val(Total);
+		} else {
+			$(elem).parent().find("#divPorciento").css('display','none');
+			$(elem).parent().find("#cPorcentaje").val('');
+			$(elem).parent().find("#descuento").css('display','block');
+			$(elem).parent().find("#descuento").val('');
+			Total = $(elem).parent().parent().find("#cMonto").val();
+			$(elem).parent().parent().find("#cTotal").val(Total);
+		}
+		
+	}
+
+	function guardarPago () {
+		var cambio = $('#cCambio').val();
+		cambio = cambio.replace('$ ','');
+		cambio = cambio.replace(',','');
+		if(cambio < 0) {
+			alert('El importe es insuficiente. El pago no se puede completar.');
+		} else {
+					categorias = [];
+					tipos = [];
+					var totalpagar = $('#hTotal').val();
+					var pago = $('#hImporte').val();
+					var change = $('#hCambio').val();
+					var servad = $('#cServicioAd').val();
+					var mserv = $('#cMontoserv').val();
+					mserv = mserv.replace('$','');
+					mserv = mserv.replace(',','');
+					var cIva = $('#cIVA').val();
+					cIva = cIva.replace('$','');
+					cIva = cIva.replace(',','');
+					$('.Montos').each(function () {
+						idtipo = $(this).parent().parent().find('#sTipopago').val();
+						monto = $(this).val();
+						monto = monto.replace('$','');
+						monto = monto.replace(',','');
+						numcuenta = $(this).parent().parent().find('#numcheque').val();
+						ban = $(this).parent().parent().find('#banco').val();
+						tipot = $(this).parent().parent().find('#tipotarjeta').val();
+						tipos.push({tipopago:idtipo,importe:monto,cuenta:numcuenta,banco:ban,tipotarjeta:tipot});
+					});
+					$('.totales').each(function () {
+						tot = $(this).val();
+						tot = tot.replace('$','');
+						tot = tot.replace(',','');
+						idcategoria = $(this).attr('idcategoria');
+						descu = $('#categoria'+idcategoria).find('#descuento').val();
+						descu = descu.replace('$','');
+						descu = descu.replace(',','');
+						canti = $('#categoria'+idcategoria).find('#cMonto').val();
+						canti = canti.replace('$','');
+						canti = canti.replace(',','');
+						categorias.push({total:tot,descuento:descu,cantidad:canti,categoria:idcategoria}); 
+					});
+					change = numeral(change).format('0,0.00');
+					datos = {idEstudio:<?php echo $estudio[0]['ID']; ?>,total:totalpagar,importe:pago,cambio:change,iva:cIva,servicioad:servad,montoserv:mserv,detalles:categorias,tiposdepago:tipos,};
+					$.ajax({
+			            type: "POST",
+			            url: "<?php echo $this->basePath() ?>/pagos/nuevopagorecepcion",
+			            dataType: "json",
+			            data: datos,
+			            beforeSend: function(){
+			            	$('#bEnviarpago').css('display','none');
+			            },
+			            success: function(data) {
+			            	$('#modalPagoNuevo').modal('hide');
+			            	listaEstudios();
+			            },
+			            error: function(){
+			               alert('Se produjo un error al realizar el pago.')
+			            }
+			    	});
+		}
+		
+	}
+</script>

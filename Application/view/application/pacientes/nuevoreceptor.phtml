@@ -1,0 +1,156 @@
+<?php $user = $this->identity(); ?>
+<?php 
+    $form->setAttribute('action', $this->url('pacientes', array('action'=>'nuevoreceptor')))
+     ->prepare();
+?>
+
+<h1>REGISTRO DE RECEPTOR</h1>
+<style>
+    .fila:hover .gli{
+        visibility: visible;
+    }
+    .gli {
+        float: right;
+        visibility: hidden;
+        margin: 0 15px 0 15px;
+    }
+</style>   
+
+<div class="row">
+    <div class="col-lg-10">
+        <div class="panel panel-primary" style="margin-top:5px">
+             <div class="panel-body">
+
+                 <!-- Tab panes -->
+                 <div class="tab-content">
+                     <div class="tab-pane fade active in" id="general-pills">    
+                         <?php echo $this->form()->openTag($form); ?>
+                     </div> 
+                     
+                     <div id="divReceptor" class="form-group">
+                        <?php
+                            $element = $form->get('RFC_R');
+                            echo $this->formRow($element);
+                        ?>
+                     </div>
+                       
+                 </div>
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('NOMBRE_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('PAIS_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('CIUDAD_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+                     
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('MUNICIPIO_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('CP_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('COLONIA_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+                     
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('CALLE_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+                     
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('NUM_INT_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+                     
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('NUM_EXT_R');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('EMAIL');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('TELFIJO');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+                     
+                     <div>
+                         <div id="divReceptor" class="form-group" rows="3">
+                            <?php
+                                $element = $form->get('TELMOVIL');
+                                echo $this->formRow($element);
+                            ?>  
+                        </div>
+                     </div>
+
+             </div>
+          </div>
+                     <div>
+                        <div class="form-element" style="margin-top:10px;float:right">
+                            <?php echo $this->formElement($form->get('env')) ?>
+                        </div>
+                     </div>
+         </div> 
+    </div>
+    
+</div>

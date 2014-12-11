@@ -1,0 +1,210 @@
+<?php 
+  $mes=date_format($pagos[0]['FECHA'],'F');
+
+  if ($mes=="January") $mes="Enero";
+  if ($mes=="February") $mes="Febrero";
+  if ($mes=="March") $mes="Marzo";
+  if ($mes=="April") $mes="Abril";
+  if ($mes=="May") $mes="Mayo";
+  if ($mes=="June") $mes="Junio";
+  if ($mes=="July") $mes="Julio";
+  if ($mes=="August") $mes="Agosto";
+  if ($mes=="September") $mes="Setiembre";
+  if ($mes=="October") $mes="Octubre";
+  if ($mes=="November") $mes="Noviembre";
+  if ($mes=="December") $mes="Diciembre";
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+	
+	<title>Recibo de pago</title>
+	
+	<link rel='stylesheet' type='text/css' href='/imedich/public/css/estilorecibo.css' />
+	<link rel='stylesheet' type='text/css' href='/imedich/public/css/print.css' media="print" />
+	<link rel='stylesheet' type='text/css' href='/imedich/public/css/bootstrap.css' />
+
+</head>
+<style type="text/css">
+	label { display: block; }
+	
+	.tablallenado {border: 1px solid #000;border-radius: 10px; overflow: scroll;}
+	.tablallenado td {padding: 3px;border: 1px solid #000; border-right: none; border-left:none}
+	.tablallenado tr {height: 40px;}
+	.header {font-size: 10px; font-weight: bolder; padding: 0;}
+	.llenado {font-size: 13px;}
+</style>
+<body>
+	<div id="page-wrap">
+    <?php for($x=0;$x<2;$x++) { ?>
+		<div id="identity">
+          <div id="logo">
+              <div id="logohelp">
+                <input id="imageloc" type="text" size="50" value="" /><br />
+                
+              </div>
+              <img id="image" src="/imedich/public/images/logo.png" alt="logo" />              
+          </div>
+          <div id="data">Av. Teofilo Borunda 2714 Col. Centro C.P. 31000 Chiahuahua Chih. M&eacute;xico Tel. (614) 201 8995 y 201 8994</div>
+		<table id="meta">
+                <tr>
+                    <td class="meta-head">Fecha</td>
+                    <td class="meta-head">Nota de Venta</td>
+                </tr>
+                <tr>
+
+                    <td><textarea name="date" id="date"><?php echo $mes.' '.date_format($pagos[0]['FECHA'],'d, Y'); ?></textarea></td>
+                    <td><textarea name="textarea"><?php echo $pagos[0]['ID'] ?></textarea></td>
+                </tr>
+          </table>
+      </div>
+      	<div class="row">
+      		<div class="col-sm-12" style="margin-top:20px">
+      			<table class="tablallenado" width="100%">
+      				<tr>
+      					<td colspan="2">
+      						<div class="header col-sm-12">NOMBRE:</div>
+      						<span class="llenado">
+      							<?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO'] ?>
+      						</span>
+      					</td>
+      					<td></td>
+      					<td><div class="header col-sm-12">RFC:</div><span class="llenado"><?php echo $paciente[0]['RFC'] ?></span></td>
+      				</tr>
+      				<tr>
+      					<td colspan="2"><div class="header col-sm-12">DOMICILIO:</div>
+      						<span class="llenado">
+      							<?php echo $paciente[0]['CALLE'].' '.$paciente[0]['NUM_EXT'].' '.$paciente[0]['NUM_INT'] ?>
+      						</span>
+      					</td>
+      					<td><div class="header col-sm-12">COLONIA:</div>
+      						<span class="llenado"><?php echo $paciente[0]['COLONIA'] ?></span>
+      					</td>
+      					<td><div class="header col-sm-12">C.P:</div>
+      						<span class="llenado"><?php echo $paciente[0]['CODIGO_POSTAL'] ?></span>
+      					</td>
+      				</tr>
+      				<tr>
+      					<td colspan="2"><div class="header col-sm-12">CIUDAD:</div>
+      						<span class="llenado"><?php echo $paciente[0]['ESTADO']['NOMBRE'].', '.$paciente[0]['MUNICIPIO']['NOMBRE'] ?></span>
+      					</td>
+      					<td><div class="header col-sm-12">TEL:</div>
+      						<span class="llenado"><?php echo $paciente[0]['TELEFONO_1'].' '.$paciente[0]['TELEFONO_2'] ?></span>
+      					</td>
+      					<td><div class="header col-sm-12">E-MAIL:</div>
+      						<span class="llenado"><?php echo $paciente[0]['EMAIL'] ?></span>
+      					</td>
+      				</tr>
+      			</table>	
+      		</div>
+      	</div> 
+      	<div class="row">
+      		<div class="col-sm-12" style="margin-top:10px">
+      			<table class="tablallenado" width="100%">
+      				<tr>
+      					<td colspan="2"><div class="header col-sm-12">NOMBRE DEL PACIENTE:</div>
+      						<span class="llenado"><?php echo $paciente[0]['NOMBRE'].' '.$paciente[0]['APELLIDO_PATERNO'].' '.$paciente[0]['APELLIDO_MATERNO'] ?></span>
+      					</td>
+      					<td></td>
+      					<td><div class="header col-sm-12">MEDICO TRATANTE:</div><span class="llenado">&nbsp;</span></td>
+      				</tr>
+      			</table>	
+      		</div>
+      	</div>  
+            		
+		<table id="items" style="margin-top:10px">
+		
+		  <tr class="item-title">
+		      <th>Descripci&oacute;n</th>
+		      <th>P. Unit.</th>
+		      <th>Cant.</th>
+		      <th>Importe</th>
+		  </tr>
+      
+      <tr class="item-row">
+          <td class="item-name"><div class="delete-wpr"><textarea><?php echo $categorias[0]['NOMBRECATEGORIA']; ?></textarea></div></td>
+          <td><textarea class="cost"><?php echo '$ '.number_format($categorias[0][0]['TOTAL']*1.16,2); ?></textarea></td>
+          <td><textarea class="qty">1</textarea></td>
+          <td><span class="price"><?php echo '$ '.number_format($categorias[0][0]['TOTAL']*1.16,2); ?></span></td>
+      </tr>
+      <?php if ($categorias[1]) { ?>
+        <tr class="item-row">
+            <td class="item-name"><div class="delete-wpr"><textarea><?php echo $categorias[1]['NOMBRECATEGORIA']; ?></textarea></div></td>
+            <td><textarea class="cost"><?php echo '$ '.number_format($categorias[1][0]['TOTAL']*1.16,2); ?></textarea></td>
+            <td><textarea class="qty">1</textarea></td>
+            <td><span class="price"><?php echo '$ '.number_format($categorias[1][0]['TOTAL']*1.16,2); ?></span></td>
+        </tr>  
+      <?php } else { ?>
+      <tr class="item-row">
+        <td class="item-name"><div class="delete-wpr"></textarea></div></td>
+          <td><textarea class="cost"></textarea></td>
+          <td><textarea class="qty"></textarea></td>
+          <td><span class="price"></span></td>
+      </tr>
+      <?php } ?>
+      <?php if ($categorias[2]) { ?>
+        <tr class="item-row">
+            <td class="item-name"><div class="delete-wpr"><textarea><?php echo $categorias[2]['NOMBRECATEGORIA']; ?></textarea></div></td>
+            <td><textarea class="cost"><?php echo '$ '.number_format($categorias[2][0]['TOTAL']*1.16,2); ?></textarea></td>
+            <td><textarea class="qty">1</textarea></td>
+            <td><span class="price"><?php echo '$ '.number_format($categorias[2][0]['TOTAL']*1.16,2); ?></span></td>
+        </tr>  
+      <?php } else { ?>
+      <tr class="item-row">
+        <td class="item-name"><div class="delete-wpr"></textarea></div></td>
+          <td><textarea class="cost"></textarea></td>
+          <td><textarea class="qty"></textarea></td>
+          <td><span class="price"></span></td>
+      </tr>
+      <?php } ?>
+      <?php if ($categorias[3]) { ?>
+        <tr class="item-row">
+            <td class="item-name"><div class="delete-wpr"><textarea><?php echo $categorias[3]['NOMBRECATEGORIA']; ?></textarea></div></td>
+            <td><textarea class="cost"><?php echo '$ '.number_format($categorias[3][0]['TOTAL']*1.16,2); ?></textarea></td>
+            <td><textarea class="qty">1</textarea></td>
+            <td><span class="price"><?php echo '$ '.number_format($categorias[3][0]['TOTAL']*1.16,2); ?></span></td>
+        </tr>  
+      <?php } else { ?>
+      <tr class="item-row">
+        <td class="item-name"><div class="delete-wpr"></textarea></div></td>
+          <td><textarea class="cost"></textarea></td>
+          <td><textarea class="qty"></textarea></td>
+          <td><span class="price"></span></td>
+      </tr>
+      <?php } ?>
+		  <?php if ($pagos[0]['SERVICIOAD']) { ?>
+		  	<tr class="item-row">
+		      <td class="item-name"><div class="delete-wpr"><textarea><?php echo $pagos[0]['SERVICIOAD']; ?></textarea></div></td>
+		      <td><textarea class="cost"><?php echo '$ '.number_format($pagos[0]['MONTOSERV']*1.16,2); ?></textarea></td>
+		      <td><textarea class="qty">1</textarea></td>
+		      <td><span class="price"><?php echo '$ '.number_format($pagos[0]['MONTOSERV']*1.16,2); ?></span></td>
+		  </tr>
+		  <?php } else { ?>
+      <tr class="item-row">
+        <td class="item-name"><div class="delete-wpr"></textarea></div></td>
+          <td><textarea class="cost"></textarea></td>
+          <td><textarea class="qty"></textarea></td>
+          <td><span class="price"></span></td>
+      </tr>
+      <?php } ?>
+		  <tr class="total-lista">
+		      <td colspan="2" class="blank"><div class="header col-sm-12">FORMA DE PAGO:</div>
+            <span class="llenado"><?php foreach ($tipos as $tipo) { ?>
+              <?php echo $tipo['TIPOP'].' '; ?>
+            <?php } ?></span> 
+          </td>
+		      <td class="total-line">Total</td>
+		      <td class="total-value"><div id="total"><?php echo '$ '.number_format($pagos[0]['CANTIDAD'],2) ?></div></td>
+		  </tr>
+	    </table>
+      <?php if ($x==0) { ?>
+        <hr style="border-top: dotted 1px;" />
+      <?php } ?>
+	 <?php } ?>
+	</div>
+	
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<table class="table table-bordered" id="tConsultas">
+  <thead>
+    <th width="10%">Fecha</th>
+    <th>Motivo <span style="float:right"><button class="btn btn-default btn-xs" type="submit" href="#consulta" data-toggle="tab" onclick="nuevaConsulta();">Nueva consulta</button></span></th>
+  </thead>
+  <tbody>
+    <?php foreach($consultas as $c) { $x = 0;?>
+        <tr>
+          <td>
+          <?php echo date_format($c['FECHA_CONS'],'d-m-Y'); ?></td>
+          <td>
+            <div class="panel-group" id="accordion<?php echo $c['ID'] ?>">
+             <div class="panel panel-default">
+               <div class="panel-heading">
+                 <h4 class="panel-title">
+                   <a data-toggle="collapse" data-parent="#accordion<?php echo $c['ID'] ?>" href="#collapse<?php echo $c['ID'] ?>">
+                     <?php echo $c['MOTIVO_CONS']; ?> 
+                   </a>
+                 </h4>
+               </div>
+               <div id="collapse<?php echo $c['ID'] ?>" class="panel-collapse collapse">
+                 <div class="panel-body">
+                   <table class="table">
+                      <thead>
+                        <th>Fecha <span style="float:right"><button class="btn btn-default btn-xs" type="submit" href="#consulta" data-toggle="tab" onclick="agregarEvolucion(<?php echo $c['ID'] ?>);">Agregar evolución</button></span></th>
+                      </thead>
+                      <tbody>
+                      <?php foreach($c['CONSULTASUBS'] as $cs) { ?>
+                        <tr>
+                          <td><a href="#consulta" data-toggle="tab" onclick="irconsulta(<?php echo $cs['ID']; ?>);"><?php setlocale(LC_ALL,"es_ES"); $x++; echo strftime('%A %d de %B del %Y Evolución '.$x,$cs['FECHA_SUB']->getTimestamp()); ?></a></td>
+                        </tr>
+                      <?php } ?>
+                      </tbody>
+                   </table>
+                 </div>
+               </div>
+             </div>
+           </div> 
+          </td>
+        </tr>
+     <?php } ?>
+  </tbody>
+</table>

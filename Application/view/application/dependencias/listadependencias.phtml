@@ -1,0 +1,77 @@
+<style type="text/css">
+    .gli {
+    	color: dodgerblue;
+        float: right;
+        margin: 0 5px 0 5px;
+        cursor: pointer;
+    }
+</style>
+<div class="col-lg-6">
+	<table class="table" id="tablaDependencia">
+		<thead>
+			<th>Dependencia o aseguradora</th>
+		</thead>
+		<tbody>
+			<?php foreach ($dependencias as $dep): ?>
+				<tr class="fila">
+					<td><span id="dep<?php echo $dep['ID']; ?>" idep="<?php echo $dep['ID']; ?>"> <span id="nombredep"><?php echo $dep['NOMBREDEPENDENCIA'] ?></span><span class="gli glyphicon glyphicon-pencil" onclick="convertirinput(this)"></span></span></td>
+				</tr>
+			<?php endforeach ?>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+
+	function editardependencia(elemento) {
+		$('table .gli').show();
+		var dependencia = $(elemento).val();
+		var idDep = $(elemento).attr('idep');
+		if (dependencia != '') {
+			$.ajax({
+	            type: "POST",
+	            url: "<?php echo $this->basePath() ?>/dependencias/editardependencia",
+	            data: {nombredependencia:dependencia,idDependencia:idDep},
+	            dataType: "html",
+	            success: function(data) {
+	            	data = JSON.parse(data);
+	             	$('#cDependencia').replaceWith('<span id="dep'+data.iddep+'" idep="'+data.iddep+'"><span id="nombredep">'+dependencia+'</span><span class="gli glyphicon glyphicon-pencil" onclick="convertirinput(this)"></span></span>');
+	            },
+	            error: function(){
+	                  alert('Ocurrió un error, inténtelo más tarde.');
+	            }
+    		});
+		} else {
+			dependencia = $(elemento).attr('placeholder');
+			$('#cDependencia').replaceWith('<span id="dep'+idDep+'" idep="'+idDep+'"><span id="nombredep">'+dependencia+'</span><span class="gli glyphicon glyphicon-pencil" onclick="convertirinput(this)"></span></span>');
+		}
+	}
+	function agregarfila () {
+		$('#tablaDependencia tbody').append('<tr><td><input type="text" class="form-control" id="cDependencia" onblur="guardardependencia(this)"></td></tr>');
+		$('#cDependencia').focus();
+	}
+	function guardardependencia (elemento) {
+		var dependencia = $(elemento).val();
+		if(dependencia != ''){
+			$.ajax({
+	            type: "POST",
+	            url: "<?php echo $this->basePath() ?>/dependencias/nuevadependencia",
+	            data: {dep:dependencia},
+	            dataType: "json",
+	            success: function(data) {
+	              $('#cDependencia').replaceWith('<span id="dep'+data['id']+'" idep="'+data['id']+'"><span id="nombredep">'+dependencia+'</span><span class="gli glyphicon glyphicon-pencil" onclick="convertirinput(this)"></span></span>');
+	            },
+	            error: function(){
+	                  alert('Ocurrió un error, inténtelo más tarde.');
+	            }
+    		});
+		}
+	}
+	function convertirinput (elem) {
+		var id = $(elem).parent().prop('id');
+		var nombredep = $('#'+id+" #nombredep").text();
+		var idep = $('#'+id).attr('idep');
+		$(elem).parent().replaceWith('<input type="text" class="form-control" id="cDependencia" idep="'+idep+'" onblur="editardependencia(this)" placeholder="'+nombredep+'">');
+		$('#cDependencia').focus();
+		$('table .gli').hide();
+	}
+</script>	

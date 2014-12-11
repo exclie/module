@@ -1,0 +1,301 @@
+<link href="<?php echo $this->basePath() ?>/public/js/chosen_v1.1.0/chosen.css" rel="stylesheet">
+<script src="<?php echo $this->basePath() ?>/public/js/chosen_v1.1.0/chosen.jquery.js"></script>
+<?php 
+     echo $this->headScript()
+            ->prependFile($this->basePath() . '/public/js/recursos/pacientenuevo.js');
+?>
+
+<style>
+	.form-element {
+		margin-bottom: 10px;
+	}
+	.form-control .dropdown{
+		width: 96%;
+	}
+	.form-control {
+		width: 96%;
+	}
+
+</style>
+<h1>Registro de paciente</h1>
+<hr>
+<div class="col-lg-12">
+	<label>Buscador:</label>
+	<input type="text" id="buscador" class="form-control" style="width:250px;margin-bottom:20px;">
+	<?php if($result == 1) { ?>
+		<div class="alert alert-success" role="alert">¡Paciente creado exitosamente!</div>
+	<?php } ?>
+	<div class="contenedor" style="margin-top:25px">
+		<div class="panel-body">
+		<?php echo $this->form()->openTag($form); ?>
+		<?php echo $this->formRow($form->get('ID_PACIENTE')); ?>
+		<?php echo $this->formRow($form->get('IdEstudio')); ?>
+		<input type="hidden" id="ins" name="ins">
+			<div class="col-sm-12">
+				<div class="row">
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('NOMBRE')) ?>
+						</div> 	
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('APELLIDO_PATERNO')) ?>
+						</div>
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('APELLIDO_MATERNO')) ?>
+						</div>
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('SEXO')) ?>
+						</div>
+				</div>
+				<div class="row">
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('CURP')) ?>
+						</div>
+						<div class="form-element col-lg-4">
+							<?php echo $this->formRow($form->get('OCUPACION')) ?>
+						</div>
+						<div class="form-element col-lg-2" id="dEmbarazo">
+							<?php echo $this->formRow($form->get('EMBARAZO')) ?>
+						</div>
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('FECHA_NACIMIENTO')) ?>
+						</div>
+				</div>
+				
+				<div class="row">
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('CALLE')) ?>
+						</div>
+				
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('COLONIA')) ?>
+						</div>
+				
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('NUMERO_EXT')) ?>
+						</div>
+					
+				
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('NUMERO_INT')) ?>
+						</div>
+				
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('CODIGO_POSTAL')) ?>
+						</div>
+				</div>
+				<div class="row">
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('ESTADO')) ?>
+						</div>
+				
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('MUNICIPIO')) ?>
+						</div>
+
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('TELEFONO_1')) ?>
+						</div>
+				
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('EMAIL')) ?>
+						</div>
+				</div>	
+							
+				<div class="row">
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('NIVEL_SOCIOECONOMICO')) ?>
+						</div>
+					
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('RELIGION')) ?>
+						</div>
+				
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('DISCAPACIDAD')) ?>
+						</div>
+					
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('GRUPO_ETNICO')) ?>
+						</div>
+				
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('TIPO_SANGUINEO')) ?>
+						</div>
+					
+						<div class="form-element col-lg-2">
+							<?php echo $this->formRow($form->get('VIVIENDA')) ?>
+						</div>
+				</div>
+				<div class="row">
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('RFC')) ?>
+						</div>
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('CLIENTE')) ?>
+						</div>
+						<div class="form-element col-lg-3">
+							<?php echo $this->formRow($form->get('AFILIACION')) ?>
+						</div>
+						<div class="form-element col-lg-2" style="margin-top:25px">
+							<button type="button" class="btn btn-warning" id="bAgregarcliente" onclick="clientesmodal()">Agregar cliente</button>
+						</div>
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<div class="row">
+					<div class="col-sm-3">
+						<label>Institución médica</label>
+						<select class="form-control dropdown" id="sDependencias">
+							<?php foreach ($dependencias as $dep) { ?>
+								<option value="<?php echo $dep['ID'] ?>" ><?php echo $dep['NOMBREDEPENDENCIA']; ?></option>
+							<?php } ?>
+						</select>
+					</div>
+					<div class="col-sm-3">
+						<label># de Afiliación</label>
+						<input type="text" id="cAfiliacion1" class="form-control">	
+					</div>
+					<div class="col-sm-1" style="margin-top:25px;">
+						<button type="button" class="btn btn-default" onclick="agregardependencia()"><span class="glyphicon glyphicon-plus"></span></button>
+					</div>
+					<div class="col-sm-4">
+						<table class="table" id="tablainstitucion">
+							<thead>
+								<tr>
+									<th>Institución</th>
+									<th># Afiliación</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>					
+		<div class="col-sm-12 form-element" style="margin-top:10px;float:right">
+				<?php echo $this->formElement($form->get('res')) ?>
+				<button type="button" class="btn btn-primary" onclick="guardarPaciente()">Guardar</button>
+		</div>	
+		<?php echo $this->form()->closeTag(); ?>	
+		</div>
+	</div>	
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="modalLabel">Registrar datos fiscales para nuevo cliente</h4>
+      </div>
+      <div class="modal-body" id="modal-body">
+        
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		function split( val ) {
+          return val.split( /;\s*/ );
+        }
+        function extractLast( term ) {
+          return split( term ).pop();
+        }
+		$( "#buscador" )
+      // don't navigate away from the field on tab when selecting an item
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "<?php echo $this->basePath() ?>/estudios/pacientes", {
+            term: extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          // custom minLength
+          var term = extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          var terms = split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = "";
+          return false;
+        }
+      }); 
+	});
+	function ocultar () {
+		if($("#sSexo").val() == 2)
+		$("#dEmbarazo").hide();
+		else
+		$("#dEmbarazo").show();	
+	}
+	function clientesmodal() {
+		$('#myModal').modal('show');
+		$.ajax({
+            type: "GET",
+            url: "nuevocliente",
+            dataType: "html",
+            success: function(data) {
+               $('#modal-body').html(data);
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+    	});
+	}
+	function guardarPaciente () {
+		var institus = [];
+		var tabla = document.getElementById('tablainstitucion');
+		for(i=1;i<=tabla.rows.length-1;i++){
+			institus.push({IDINSTITUCION:tabla.rows[i].getAttribute('idins'),AFILIACION:tabla.rows[i].getAttribute('afilia')});
+		}
+		$("#ins").val(JSON.stringify(institus));
+		datastring = $('#pacientes').serialize();
+		$.ajax({
+              type: "POST",
+              url: "<?php echo $this->basePath() ?>/pacientes/pacientenuevo",
+              dataType: "json",
+              data: datastring,
+              success: function(data) {
+              	if(data.resultado == 1){
+              		alert('Paciente creado');
+              	} else {
+              		 alert('Paciente no creado');
+              	}
+              },
+              error: function(){
+                alert('px');
+              }
+        });
+	}
+	function agregardependencia () {
+		var numdep = $('#sDependencias').val();
+		var depen = $('#sDependencias option:selected').text();
+		$('#sDependencias option:selected').prop('disabled',true);
+		var num = $('#cAfiliacion1').val();
+		$('#tablainstitucion tbody').append('<tr id="'+numdep+'" idins="'+numdep+'" afilia="'+num+'"><td>'+depen+'</td><td>'+num+'<span class="glyphicon glyphicon-remove" style="color:crimson;float:right;cursor:pointer"'+' onclick="borrarFila(\''+numdep+'\')"></span></td></tr>');
+	}
+	function borrarFila (fila) {
+		$('#'+fila).remove();
+	}
+</script>
+
+

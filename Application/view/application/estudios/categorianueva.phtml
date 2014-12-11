@@ -1,0 +1,119 @@
+<?php 
+	$form->setAttribute('action', $this->url('estudios', array('action'=>'categorianueva')))
+     ->prepare();
+     echo $this->headScript()
+            ->prependFile($this->basePath() . '/public/js/recursos/verificarCampos.js');
+
+     echo $this->headScript()
+            ->prependFile($this->basePath() . '/public/js/transition.js');
+?>
+<div class="col-lg-12" style="float:none">
+	<?php echo $this->form()->openTag($form); ?>
+	<?php echo $this->formRow($form->get('ID')); ?>
+	<?php echo $this->formRow($form->get('MATERIALES_ARRAY')); ?>
+	<div class="col-lg-12" style="float:none">
+		<div class="col-lg-8">
+			<?php echo $this->formRow($form->get('NOMBRECATEGORIA')); ?>
+		</div>
+		<div class="col-lg-6">
+			<?php echo $this->formRow($form->get('DEPENDENCIA')); ?>
+		</div>
+		<div class="col-lg-4" style="margin-bottom:10px">
+			<?php echo $this->formRow($form->get('COSTO')); ?>
+		</div>
+		<div class="col-sm-12">
+		  <label style="color:red" id="labelInt">Activo :</label>
+		  <?php echo $this->formRow($form->get('ACTIVO')); ?>
+		</div>
+	</div>
+	<?php echo $this->form()->closeTag(); ?>
+	<div class="col-lg-12">
+		<div class="col-lg-5">
+			<label for="sMaterial">Material necesario</label>
+			<select class="form-control dropdown" id="sMaterial">
+				<?php foreach ($materiales as $mat) { ?>
+					<option value="<?php echo $mat['ID'] ?>"><?php echo $mat['MATERIAL'] ?></option>	
+				<?php } ?>
+			</select>		
+		</div>
+		<div class="col-lg-5">
+			<label for="cCantidad">Cantidad necesaria</label>
+			<input type="text" id="cCantidad" class="form-control">		
+		</div>
+		<div class="col-lg-2">
+			<button class="btn btn-warning" id="bAgregar" style="margin-top:25px" onclick="agregarMaterial();">Agregar</button>
+		</div>
+	</div>
+	<div class="col-lg-12" >
+		<table class="table" id="tablaMateriales">
+			<thead>
+				<th>Material</th>
+				<th>Cantidad</th>
+			</thead>
+			<tbody>
+				<?php if($listaMateriales) { $i = 0; foreach ($listaMateriales as $matnec){ $i++;?>
+					<tr id="<?php echo $i ?>" idmaterial="<?php echo $matnec['ID'] ?>" cantidad="<?php echo $matnec['CANTIDAD'] ?>">
+						<td><?php echo $matnec['MATERIAL'] ?></td>
+						<td><?php echo $matnec['CANTIDAD'] ?><span class="glyphicon glyphicon-remove" style="float:right;color:crimson;cursor:pointer"
+						onclick="borrarInventarioEstudio(<?php echo $matnec['ID'] ?>,<?php echo $i ?>)"></span></td>
+					</tr>
+				<?php } }?>
+			</tbody>
+		</table>
+	</div>
+</div>
+<script type="text/javascript">
+	var altura = 200;
+	var contador = 0;
+	function agregarMaterial () {
+		contador++;
+		var nombreMaterial = $('#sMaterial option:selected').text();
+		var cantidad = $('#cCantidad').val();
+		var idMaterial = $('#sMaterial option:selected').val();
+		$('#tablaMateriales tbody').append('<tr id="'+contador+'-'+idMaterial+'" idmaterial="'+idMaterial+'" cantidad="'+cantidad+'"><td>'+nombreMaterial+'</td><td>'+cantidad+'</td></tr>');
+	}
+	function guardarCategoria() {
+    	var materiales = [];
+    	for(i=1;i<=document.getElementById('tablaMateriales').rows.length-1;i++){
+    	  materiales.push({material:document.getElementById('tablaMateriales').rows[i].getAttribute('idmaterial'),cantidad:document.getElementById('tablaMateriales').rows[i].getAttribute('cantidad')});
+    	}
+    	materiales = JSON.stringify(materiales);
+    	$('#hMateriales').val(materiales);
+		$.ajax({
+            type: "POST",
+            url: "categorianueva",
+            dataType: "json",
+            data: $("#categorias").serialize(),
+            success: function(data) {
+				$('#modalMaterialNuevoBody').prepend('<div class="alert alert-success fade" id="alertMaterialCreado" role="alert" style="padding:5px">Cambios guardados.</div>');
+				 $('#alertMaterialCreado').transition({ opacity: 1 });
+				 listaCategorias();
+				 $('#modalCategoriaNueva').modal('hide');
+            },
+            error: function(){
+                $('#modalMaterialNuevoBody').prepend('<div class="alert alert-danger fade" id="alertMaterialCreado" role="alert" style="padding:5px">El material no pudo ser agregado, existe un problema de red.</div>');
+				$('#alertMaterialCreado').transition({ opacity: 1 });
+            }
+    	});
+	}
+	function borrarInventarioEstudio(idMaterial,tr) {
+		var idEstudio = $('#hEstudio').val();
+		$.ajax({
+            type: "POST",
+            url: "borrarmatnecesario",
+            dataType: "json",
+            data: {idMat:idMaterial,idEst:idEstudio},
+            success: function(data) {
+            	borrarFila(tr);
+            },
+            error: function(){
+                $('#modalMaterialNuevoBody').prepend('<div class="alert alert-danger fade" id="alertMaterialCreado" role="alert" style="padding:5px">Ocurrió un error.</div>');
+				$('#alertMaterialCreado').transition({ opacity: 1 });
+            }
+    	});
+	}
+	function borrarFila(tr){
+		$('#'+tr).remove();
+	}
+
+</script>

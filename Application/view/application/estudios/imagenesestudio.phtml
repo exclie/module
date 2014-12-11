@@ -1,0 +1,123 @@
+<?php 
+if (defined('RUNNING_FROM_ROOT')) {
+  $this->plugin('basePath')->setBasePath($this->basePath().'/public');
+} 
+  echo $this->headLink()
+     ->appendStylesheet($this->basePath() . '/js/downloads/css/dropzone.css')
+     ->appendStylesheet($this->basePath() . '/js/fotorama/fotorama.css');
+  echo $this->headScript()
+         ->appendFile($this->basePath() . '/js/downloads/dropzone.js')
+         ->appendFile($this->basePath() . '/js/fotorama/fotorama.js');
+ ?>
+
+<h4>Interpretación del estudio.</h4> 
+<textarea class="form-control" rows="5" style="margin-bottom:20px" id="interpretacion" <?php if($estado[0]['ESTADO'] == 3 || ($estado[0]['ESTADO'] == 2 && $estado[0]['REVISION'] == false) || ($this->identity()->getRole()->getId() != 4 && $this->identity()->getRole()->getId() != 7)) { echo "disabled";} ?>><?php echo $estado[0]['INTERPRETACION'] ?></textarea>
+<div class="fotorama" data-nav="thumbs" data-width="100%" data-ratio="800/600">
+	<?php if($imagenes) {
+          foreach($imagenes as $i) { $foto = explode('.',$i['IMAGEN']);?>
+		        <a href="<?php echo $this->basePath().'/imagenes/Estudios/'.$idEstudio.'/'.$i['IMAGEN']?>"> 
+              <img src="<?php echo $this->basePath().'/imagenes/Estudios/'.$idEstudio.'/'.$foto[0].'_th.'.$foto[1]?>">
+            </a>
+	<?php } ?>
+ <?php } ?>
+</div>
+<?php if($estado[0]['ESTADO'] == 2 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7)) { ?>
+<div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" style="color:dodgerblue">
+          Añadir imágenes
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+        	<form action="<?php echo $this->basePath() ?>/estudios/recibir" class="dropzone" id="zona-drop">
+        		<input type="hidden" name="PACIENTE" value="<?php echo $idPaciente ?>" />
+        		<input type="hidden" name="ESTUDIO" value="<?php echo $idEstudio ?>" />
+        	</form>
+      </div>
+    </div>
+<div class="col-sm-12">
+  <button type="button" class="btn btn-primary" style="float:right" onclick="interpretacion()">
+    Guardar estudio
+  </button>
+</div>
+<?php } ?>
+<?php if($estado[0]['ESTADO'] == 3 && $estado[0]['REVISION'] == false && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7)) { ?>
+    <button type="button" class="btn btn-warning" onclick="abrirestudio()">Abrir estudio para int.</button>
+<?php } ?>
+<?php if($estado[0]['ESTADO'] == 4 && $estado[0]['REVISION'] == true) { ?>
+    <a href="<?php echo $this->basePath().'/estudios/interpretacionpdf/'.$idEstudio ?>"><button type="button" class="btn btn-warning">Imprimir interpretación.</button></a>
+<?php } ?>
+<script>
+<?php if($estado[0]['ESTADO'] == 2 && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7)) { ?>
+var myDropzone = new Dropzone("#zona-drop", {
+	paramName: "file", // The name that will be used to transfer the file
+	  maxFilesize: 2, // MB
+	  accept: function(file, done) {
+	    done();
+	  },
+	  addRemoveLinks: true,
+	  removedfile: function(file){
+	  	var datos = {archivo:file.name,estudio:<?php echo $idEstudio; ?>};
+	  	$.ajax({
+            type: "POST",
+            url: "<?php echo $this->basePath() ?>/estudios/remover",
+            data: datos,
+            dataType: "json",
+            success: function(data) {
+               	  	var _ref;
+                       if (file.previewElement) {
+                         if ((_ref = file.previewElement) != null) {
+                           _ref.parentNode.removeChild(file.previewElement);
+                         }
+                       }
+                       return this._updateMaxFilesReachedClass();
+               	  },
+            error: function(data){
+                  	  	var _ref;
+                          if (file.previewElement) {
+                            if ((_ref = file.previewElement) != null) {
+                              _ref.parentNode.removeChild(file.previewElement);
+                            }
+                          }
+                          return this._updateMaxFilesReachedClass();
+ 
+            }
+        });
+  	  }
+});
+function interpretacion() {
+     var interpretacion = document.getElementById('interpretacion').value;
+     $.ajax({
+              type: "POST",
+              url: "<?php echo $this->basePath() ?>/estudios/interpretacion",
+              dataType: "json",
+              data: {inter:interpretacion,estudio:<?php echo $idEstudio ?>},
+              success: function(data) {
+                location.reload(true);
+              },
+              error: function(){
+                
+              }
+        });
+}
+<?php } ?>
+
+<?php if($estado[0]['ESTADO'] == 3 && $estado[0]['REVISION'] == false && ($this->identity()->getRole()->getId() == 4 || $this->identity()->getRole()->getId() == 7)) { ?>
+function abrirestudio() {
+  $.ajax({
+           type: "POST",
+           url: "<?php echo $this->basePath() ?>/estudios/abrirestudio",
+           dataType: "json",
+           data: {estudio:<?php echo $idEstudio ?>},
+           success: function(data) {
+             location.reload(true);
+           },
+           error: function(){
+             
+           }
+     });
+}
+<?php } ?>
+</script>

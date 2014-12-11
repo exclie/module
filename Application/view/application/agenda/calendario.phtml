@@ -1,0 +1,421 @@
+<?php 
+      echo $this->headLink()
+      ->appendStylesheet($this->basePath() . '/public/js/chosen_v1.1.0/chosen.css');
+      echo $this->headScript()
+      ->appendFile($this->basePath() . '/public/js/chosen_v1.1.0/chosen.jquery.js');
+?>
+<style type="text/css">
+	.ui-autocomplete {
+		z-index: 1051;
+	}
+</style>
+<link rel='stylesheet' href='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/fullcalendar.css' />
+<link rel='stylesheet' href='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/fullcalendar.print.css' media='print' />
+<link rel='stylesheet' href='<?php echo $this->basePath() ?>/public/js/colorpicker/jquery.simplecolorpicker.css' />
+<script src='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/lib/moment.min.js'></script>
+<script src='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/fullcalendar.js'></script>
+<script src='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/lib/jquery-ui.custom.min.js'></script>
+<script src='<?php echo $this->basePath() ?>/public/js/fullcalendar-2.1.1/lang-all.js'></script>
+<script src='<?php echo $this->basePath() ?>/public/js/colorpicker/jquery.simplecolorpicker.js'></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+<script type="text/javascript">
+	<?php if ($nombre) { ?> 
+
+	<?php }?> 
+	var jsEvento;
+	$(document).ready(function() {
+    // page is now ready, initialize the calendar...
+    $('#sCategorias').chosen({width:'100%'});
+    $('#sColores').simplecolorpicker();
+    $('#lBorrar').hide();
+    crearcalendario();
+    var cambiartipos = function() {
+      tiposx(this.value);
+    };
+    
+    $('#sDependencia').on('change',cambiartipos);
+    function split( val ) {
+          return val.split( /;\s*/ );
+        }
+        function extractLast( term ) {
+          return split( term ).pop();
+        }
+        $( "#cTitle" )
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "<?php echo $this->basePath() ?>/estudios/pacientes", {
+            term: extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          var term = extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          return false;
+        },
+        select: function( event, ui ) {
+          $("#cIdPaciente").val(ui.item.id);
+          $("#cTitle").val(ui.item.value).attr('readonly',true);
+          var terms = split( this.value );
+          terms.pop();
+          terms.push( ui.item.value );          
+          terms.push( "" );
+          return false;
+        }
+      }).click(function(){
+      	$("#cIdPaciente").val('');
+      	$(this).removeAttr('readonly').val('');
+      }); 
+      $( "#cDoc" )
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).autocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .autocomplete({
+        source: function( request, response ) {
+          $.getJSON( "<?php echo $this->basePath() ?>/estudios/doctores", {
+            term: extractLast( request.term )
+          }, response );
+        },
+        search: function() {
+          var term = extractLast( this.value );
+          if ( term.length < 2 ) {
+            return false;
+          }
+        },
+        focus: function() {
+          return false;
+        },
+        select: function( event, ui ) {
+          $("#cRefDocId").val(ui.item.id);
+          $("#cDoc").val(ui.item.value).attr('readonly',true);
+          var terms = split( this.value );
+          terms.pop();
+          terms.push( ui.item.value );          
+          terms.push( "" );
+          return false;
+        }
+      }).click(function(){
+      	$(this).removeAttr('readonly').val('');
+      	$("#cRefDocId").val('');
+      }); 
+
+});
+function borrarevento () {
+	$.post('borrarevento',{id:$("#id_evento").val()},
+		function (data){
+			location.reload();
+	});
+}
+function guardarevento () {
+	var evento = $('#cFin').val();
+	evento = evento.split("T");
+	fin = evento[0]+"T"+$('#hasta').val()+':00';
+	inicio = evento[0]+"T"+$('#desde').val()+':00';
+	if(inicio < fin) {
+		$('#cFin').val(fin);
+		$('#cInicio').val(inicio);
+		var pacientenr = $('#cTitle').val();
+		$('#cPacientenr').val(pacientenr);
+		var estudios = $('#sCategorias').val();
+		var edad = $('#cEdad').val();
+		if (pacientenr != '' && estudios != null && edad != '') {
+			guardareventodrop();
+		} else {
+			alert('Los campos de Nombre de paciente, Edad y Estudios a realizar necesitan llenarse antes de poder guardar el evento.');
+		}
+	} else {
+		alert('La hora de inicio es mayor que la del final del evento. Es necesario tener una hora de inicio menor que la hora de finalización del evento.');
+	}
+}
+function guardareventodrop () {
+	var datastring = $('#agendas').serialize();
+	
+			$.ajax({
+		            type: "POST",
+		            url: "<?php echo $this->basePath() ?>/agenda/guardarevento",
+		            data: datastring,
+		            dataType: "json",
+		            success: function(data) {
+		               $('#myModal').modal('hide');
+		               $('#calendar').fullCalendar('refetchEvents');
+		            },
+		            error: function(){
+		                  alert('Ocurrió un error, inténtelo más tarde.');
+		            }
+		    });
+	} 
+
+
+function objToString (obj) {
+    var str = '';
+    for (var p in obj) {
+        if (obj.hasOwnProperty(p)) {
+            str += p + '::' + obj[p] + '\n';
+        }
+    }
+    return str;
+}
+
+function tiposx (id) {
+	var costo = 0;
+    $('#sCategorias').empty();
+    $.post("<?php echo $this->basePath() ?>/dependencias/gettipos", {dependencia: id},
+          function (data) {
+           for(i = 0; i < data.length; i++){
+           	costo = (data[i].COSTO*1.16);
+            $('#sCategorias').append("<option value='"+data[i].ID+"'>"+data[i].NOMBRECATEGORIA+" ("+numeral(costo).format('$ 0,0.00')+")</option>");
+          }
+          $('#sCategorias').trigger('chosen:updated');
+          });
+  }
+
+function crearcalendario() {
+	$('#cDoctor').val($('#sDoctor').val());
+	$('#calendar').fullCalendar('destroy');
+	$('#calendar').fullCalendar({
+			allDaySlot: false,
+			contentHeight: 800,
+			minTime: "08:00:00",
+			maxTime: "20:00:00",
+			slotDuration: "00:15:00",
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			events: {
+			        url: '<?php echo $this->basePath() ?>/agenda/vereventos',
+			        type: 'POST',
+			        data: {
+			            idDoctor: $('#sDoctor').val(),
+			        },
+			        error: function() {
+			            alert('there was an error while fetching events!');
+			        }
+			},
+			eventTextColor: 'black',
+			editable: <?php if($this->identity()->getRole()->getId() != '5' && $this->identity()->getRole()->getId() != '4') {echo "true";} else { echo "false";} ?>,
+			defaultView: 'agendaWeek',
+			lang: 'es',
+			eventClick: function(calEvent, jsEvent, view) {
+					console.log(calEvent);
+					document.getElementById('agendas').reset();
+			        //alert('Event: ' + calEvent.start.format());
+			        var arreglo_fecha = calEvent.start.format().split("T");
+			        $("#sCategorias option:selected").removeAttr("selected");
+			        $("#cInicio").val(calEvent.start.format());
+			        $("#desde").val(calEvent.start.format("HH:mm"));
+			        $("#hasta").val(calEvent.end.format("HH:mm"));
+			        $("#cFin").val(calEvent.end.format());
+			        $("#cTitle").val(calEvent.pacientenr);
+			        $("#aDesc").val(calEvent.descripcion);
+			        $("#cEdad").val(calEvent.edad);
+			        $('#modificacion').text(calEvent.firstName+' '+calEvent.lastName+' '+calEvent.apellidoMaterno);
+			        $("#cRefDocId").val(calEvent.refdocid);
+			        $("#cTel1").val(calEvent.telefono1);
+			        $("#cTel2").val(calEvent.telefono2);
+			        $("#cDoc").val(calEvent.refdoctor);
+			        $("#sDependencia").val(calEvent.dependencia);
+			        $("#cIdPaciente").val(calEvent.paciente);			    
+			        $("#sEstudios").val(calEvent.estudios);
+			        $("#id_evento").val(calEvent.id);
+			   		$("#lBorrar").show();
+			   		$("#sColores").val(calEvent.color);
+			        $("#modalLabel").text(calEvent.start.format("DD/MM/YY"));
+			        verevento();
+			        $('#myModal').modal('show');
+
+			},
+			<?php if($this->identity()->getRole()->getId() != '5' && $this->identity()->getRole()->getId() != '4') { ?>
+			dayClick: function(date, jsEvent, view) {
+			        var fin = date;
+			        document.getElementById('agendas').reset();
+			        <?php if ($nombre) { ?>
+			        	$('#cTitle').val('<?php echo $nombre." ".$apPaterno." ".$apMaterno ?>').attr('readonly','readonly');
+			        	$('#cEdad').val(getEdad('<?php echo date_format($fecha_nac,"Y-m-d") ?>')+' años').attr('readonly','readonly');
+			        <?php } ?>
+			        $("#cInicio").val(date.format());
+			        $("#cFin").val(fin.toISOString());
+			        $("#desde").val(date.format("HH:mm"));
+			        fin.add('m',30);
+			        $("#hasta").val(fin.format("HH:mm"));
+			        $("#id_evento").val('');
+			        $("#cRefDocId").val('');
+			        $("#cIdPaciente").val('');
+			        $("#sCategorias option:selected").removeAttr("selected");
+			        $("#lBorrar").hide();
+			        $("#modalLabel").text(date.format("DD/MM/YY"));
+			        $('#myModal').modal('show');
+			        $("#sCategorias").trigger("chosen:updated");
+			  	
+			},
+			eventDrop: function (event,delta,revertFunc) {
+				$("#sCategorias option:selected").removeAttr("selected");
+				$("#cInicio").val(event.start.format());
+				$("#cTitle").val(event.pacientenr);
+				$("#aDesc").val(event.descripcion);
+				$("#cFin").val(event.end.format());
+				$("#sDependencia").val(event.dependencia);
+				$("#id_evento").val(event.id);
+				$("#cRefDocId").val(event.refdocid);
+				$("#cIdPaciente").val(event.paciente);
+				$("#sColores").val(event.color);
+				verevento();
+				guardareventodrop();
+			},
+			eventResize: function (event,delta,revertFunc) {
+				$("#sCategorias option:selected").removeAttr("selected");
+				$("#cInicio").val(event.start.format());
+				$("#cTitle").val(event.pacientenr);
+				$("#aDesc").val(event.descripcion);
+				$("#cFin").val(event.end.format());
+				$("#sDependencia").val(event.dependencia);
+				$("#id_evento").val(event.id);
+				$("#cRefDocId").val(event.refdocid);
+				$("#cIdPaciente").val(event.paciente);
+				$("#sColores").val(event.color);
+				verevento();
+				guardareventodrop();
+			},
+		<?php } ?>
+		});
+}
+function getEdad(dateString) {
+    var hoy = new Date();
+    var fechaNacimiento = new Date(dateString);
+    var edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    var m = hoy.getMonth() - fechaNacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
+  }
+function verevento() {
+	var idDoc = <?php echo $this->identity()->getId(); ?>;
+	var idEv = $("#id_evento").val();
+	var valores = [];
+	$.ajax({
+            type: "POST",
+            url: "<?php echo $this->basePath() ?>/agenda/verevento",
+            data: {idDoctor:idDoc,idEvento:idEv},
+            dataType: "json",
+            success: function(data) {
+               for(i=0;i<data.length;i++) {
+               		$("#sCategorias option[value = '"+data[i].ID+"' ]").attr("selected", true);
+               }
+           		$("#sCategorias").trigger("chosen:updated");
+            },
+            error: function(){
+                  alert('Ocurrió un error, inténtelo más tarde.');
+            }
+    });
+}
+</script>
+<div class="row">
+	<div class="form-element col-lg-4">
+		<label>Agenda para el doctor:</label>
+		<select class="form-control dropdown" id="sDoctor" onchange="crearcalendario()">
+			<?php foreach ($doctores as $doc) { ?>
+				<option value="<?php echo $doc['id'] ?>"><?php echo $doc['firstName'].' '.$doc['lastName'].' '.$doc['APELLIDO_MATERNO']; ?></option>
+			<?php } ?>
+		</select>
+	</div>
+</div>
+<div class="contenedor" id='calendar' style="margin-top:15px"></div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="modalLabel"></h4>
+      </div>
+      <div class="modal-body">
+        <?php echo $this->form()->openTag($form); ?>
+        <?php echo $this->formRow($form->get('doctor')); ?>
+        <?php echo $this->formRow($form->get('refdocid')); ?>
+        <?php echo $this->formRow($form->get('paciente')); ?>
+        <?php echo $this->formRow($form->get('pacientenr')); ?>
+		<?php echo $this->formRow($form->get('id')); ?>
+		<?php echo $this->formRow($form->get('start')); ?>
+		<?php echo $this->formRow($form->get('end')); ?>
+		<table width="100%">
+			<thead>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						Última modificación: <span id="modificacion"><?php echo $this->identity()->getFirstname().' '.$this->identity()->getLastname().' '.$this->identity()->getApellidoMaterno(); ?></span>
+					</td>
+				</tr>
+				<tr>
+					<td><div class="col-lg-4"><b>Inicio:</b><input class="form-control" type="time" id="desde" /></div> <div class="col-lg-4"><b>Fin: </b><input class="form-control col-lg-4" type="time" id="hasta" /></div></td>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-element col-lg-6">
+							<?php echo $this->formRow($form->get('title')) ?>
+						</div>
+						<div class="col-lg-3"><?php echo $this->formRow($form->get('edad')) ?></div>
+					</td>		
+				</tr>
+				<tr>
+					<td>
+						<div class="form-element col-lg-6">
+							<?php echo $this->formRow($form->get('refdoctor')) ?>
+						</div>
+						<div class="form-element col-lg-4">
+							<?php echo $this->formRow($form->get('dependencia')) ?>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-element col-sm-6">
+							<?php echo $this->formRow($form->get('telefono1')) ?>
+						</div>
+						<div class="form-element col-sm-6">
+							<?php echo $this->formRow($form->get('telefono2')) ?>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-element col-lg-12">
+							<?php echo $this->formRow($form->get('tipo[]')) ?>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-element col-lg-12">
+							<?php echo $this->formRow($form->get('descripcion')) ?>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="form-element col-lg-12">
+			<?php echo $this->formRow($form->get('color')) ?>
+		</div>
+      </div>
+      <div class="modal-footer">
+      	<a href="#" onclick="borrarevento();" id="lBorrar" style="float:left">Eliminar evento</a>
+        <?php echo $this->formElement($form->get('env')) ?>
+        <?php echo $this->form()->closeTag(); ?>	
+      </div>
+    </div>
+  </div>
+</div>
